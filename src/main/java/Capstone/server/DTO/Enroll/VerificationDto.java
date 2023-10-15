@@ -1,16 +1,16 @@
-package Capstone.server.DTO.Login;
+package Capstone.server.DTO.Enroll;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@Getter
-@Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class LoginResult {
+@Getter
+@Setter
+public class VerificationDto {
+    String verificationHashcode;
+    long EpochSecond;
     String msg;
-    int userKey;
-    String userNickName;
 }
