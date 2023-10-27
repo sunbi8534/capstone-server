@@ -1,6 +1,7 @@
 package Capstone.server.Repository;
 
 import Capstone.server.DTO.Enroll.UserDto;
+import Capstone.server.DTO.Login.LoginDataDto;
 import Capstone.server.Service.UtilService;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
@@ -76,5 +77,11 @@ public class EnrollRepository {
                 userDto.getDept_name1(), userDto.getDept_name2());
         for (String course_name : userDto.getCourse_name())
             jdbcTemplate.update(insertTakeSql, userDto.getNickname(), course_name, true, false, false);
+    }
+
+    public void changePassword(LoginDataDto loginDataDto) {
+        String passwordHash = utilService.makeHashcode(loginDataDto.getPassword());
+        String changePasswordSql = "update user set password = ? where email = ?;";
+        jdbcTemplate.update(changePasswordSql, passwordHash, loginDataDto.getEmail());
     }
 }

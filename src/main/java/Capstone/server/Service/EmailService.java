@@ -30,13 +30,16 @@ public class EmailService {
         javaMailSender.send(msg);
     }
 
-    public Boolean checkEmailError(String email, VerificationDto verificationDto) {
-        if(!checkEmailForm(email)) {  //이메일 형식이 맞는지 체크
+    public Boolean checkEmailError(String email, VerificationDto verificationDto, Boolean type) {
+        if (!checkEmailForm(email)) {  //이메일 형식이 맞는지 체크
             verificationDto.setMsg("noEmailForm");
             return true;
         }
         else if (enrollRepository.checkDuplicateEmail(email)) {   //중복되는 이메일이 있는지 체크
-            verificationDto.setMsg("duplicate");
+            if (type)
+                verificationDto.setMsg("duplicate");
+            else
+                verificationDto.setMsg("noId");
             return true;
         }
 

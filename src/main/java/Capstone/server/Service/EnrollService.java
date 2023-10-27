@@ -3,6 +3,7 @@ package Capstone.server.Service;
 import Capstone.server.DTO.Enroll.UserDto;
 import Capstone.server.DTO.Enroll.VerificationCheckDto;
 import Capstone.server.DTO.Enroll.VerificationDto;
+import Capstone.server.DTO.Login.LoginDataDto;
 import Capstone.server.Repository.EnrollRepository;
 import org.springframework.stereotype.Service;
 
@@ -75,5 +76,9 @@ public class EnrollService {
 
     public void enrollUser(UserDto userDto) {
         enrollRepository.enrollUser(userDto);
+    }
+
+    public void changePassword(LoginDataDto loginDataDto) {
+        enrollRepository.changePassword(loginDataDto);
     }
 }

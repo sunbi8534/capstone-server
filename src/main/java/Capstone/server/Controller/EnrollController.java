@@ -3,6 +3,7 @@ package Capstone.server.Controller;
 import Capstone.server.DTO.Enroll.UserDto;
 import Capstone.server.DTO.Enroll.VerificationCheckDto;
 import Capstone.server.DTO.Enroll.VerificationDto;
+import Capstone.server.DTO.Login.LoginDataDto;
 import Capstone.server.Service.EmailService;
 import Capstone.server.Service.EnrollService;
 import org.springframework.web.bind.annotation.*;
@@ -37,11 +38,30 @@ public class EnrollController {
     public VerificationDto checkEmailEnroll(@RequestBody String email) {
         VerificationDto verificationDto = new VerificationDto();
         //이메일과 관련해서 에러가 존재한다면
-        if(emailService.checkEmailError(email, verificationDto))
+        if(emailService.checkEmailError(email, verificationDto, true))
             return verificationDto;
 
         enrollService.verificationProcess(email, verificationDto);
         return verificationDto;
+    }
+
+    @ResponseBody
+    @PostMapping("/find/authenticate/pw")
+    public VerificationDto checkEmailPw(@RequestBody String email) {
+        VerificationDto verificationDto = new VerificationDto();
+
+        if(emailService.checkEmailError(email, verificationDto, false))
+            return verificationDto;
+
+        enrollService.verificationProcess(email, verificationDto);
+        return verificationDto;
+    }
+
+    @ResponseBody
+    @PostMapping("/user/changePassword")
+    public String changePassword(@RequestBody LoginDataDto loginDataDto) {
+        enrollService.changePassword(loginDataDto);
+        return "ok";
     }
 
     @ResponseBody
