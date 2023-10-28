@@ -13,7 +13,6 @@ public class UserDto {
     String email;
     String password;
     String nickname;
-    int dept_num;
     String dept_name1;
     String dept_name2;
     List<String> course_name;

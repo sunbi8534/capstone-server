@@ -64,8 +64,8 @@ public class EnrollRepository {
 
     public void enrollUser(UserDto userDto) {
         String enrollUserSql = "insert into user (nickname, email, password, introduction," +
-                "profild_image_path, point, study_cnt) values (?, ?, ?, ?, ?, ?, ?);";
-        String insertMajorSql = "insert into major_in (nickname, dept_num, dept_name1, dept_name2) " +
+                "profile_image_path, point, study_cnt) values (?, ?, ?, ?, ?, ?, ?);";
+        String insertMajorSql = "insert into major_in (nickname, dept_name1, dept_name2) " +
                 "values (?, ?, ?, ?);";
         String insertTakeSql = "insert into take (nickname, course_name, is_now, is_past, is_pick) " +
                 "values (?, ?, ?, ?, ?);";
@@ -73,8 +73,7 @@ public class EnrollRepository {
         String passwordHash = utilService.makeHashcode(userDto.getPassword());
         jdbcTemplate.update(enrollUserSql, userDto.getNickname(), userDto.getEmail(), passwordHash,
                 "", "", 0, 0);
-        jdbcTemplate.update(insertMajorSql, userDto.getNickname(), userDto.getDept_num(),
-                userDto.getDept_name1(), userDto.getDept_name2());
+        jdbcTemplate.update(insertMajorSql, userDto.getNickname(), userDto.getDept_name1(), userDto.getDept_name2());
         for (String course_name : userDto.getCourse_name())
             jdbcTemplate.update(insertTakeSql, userDto.getNickname(), course_name, true, false, false);
     }
