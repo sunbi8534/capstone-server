@@ -164,7 +164,35 @@ public class ProfileRepository {
         jdbcTemplate.update(sql, relation, !value, nickname, otherNickname);
     }
 
+    public List<String> getFriendList(String nickname) {
+        String getFriendListSql = "select other_nickname from relationship where nickname = ? and is_friend = true;";
+        return jdbcTemplate.query(getFriendListSql, (rs, rowNum) -> {
+            return new String(rs.getString("other_nickname"));
+        }, nickname);
+    }
 
+    public List<String> getBlockList(String nickname) {
+        String getBlockListSql = "select other_nickname from relationship where nickname = ? and is_block = true;";
+        return jdbcTemplate.query(getBlockListSql, (rs, rowNum) -> {
+            return new String(rs.getString("other_nickname"));
+        }, nickname);
+    }
+
+    public List<String> getPickList(String nickname) {
+        String getPickListSql = "select other_nickname from relationship where nickname = ? and is_pick = true;";
+        return jdbcTemplate.query(getPickListSql,(rs, rowNum) -> {
+            return new String(rs.getString("other_nickname"));
+        }, nickname);
+    }
+
+    public String getProfileImage(String nickname) {
+        String getProfileImagePathSql = "select profile_image_path from user where nickname = ?;";
+        List<String> imagePath = jdbcTemplate.query(getProfileImagePathSql, (rs, rowNum) -> {
+            return new String(rs.getString("profile_image_path"));
+        }, nickname);
+
+        return imagePath.get(0);
+    }
 
     @AllArgsConstructor
     @Getter

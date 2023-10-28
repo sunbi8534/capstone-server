@@ -6,7 +6,8 @@ import Capstone.server.Repository.LoginRepository;
 import org.springframework.stereotype.Service;
 
 @Service
-public class LoginService {
+public class
+LoginService {
     UtilService utilService;
     LoginRepository loginRepository;
     public LoginService(UtilService utilService,

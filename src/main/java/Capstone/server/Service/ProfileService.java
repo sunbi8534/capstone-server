@@ -1,6 +1,7 @@
 package Capstone.server.Service;
 
 import Capstone.server.DTO.Profile.DepartmentDto;
+import Capstone.server.DTO.Profile.UserInfoMinimumDto;
 import Capstone.server.DTO.Profile.UserProfileInfoDto;
 import Capstone.server.DTO.Profile.UserProfileInfoForShowDto;
 import Capstone.server.Repository.ProfileRepository;
@@ -14,6 +15,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
 
@@ -123,5 +125,41 @@ public class ProfileService {
 
     public void setBlock(String nickname, String otherNickname) {
         profileRepository.setRelationship(nickname, otherNickname, "is_block");
+    }
+
+    public List<UserInfoMinimumDto> getFriendInfoList(String nickname) {
+        List<UserInfoMinimumDto> friendInfoList = new ArrayList<>();
+        List<String> friendList = profileRepository.getFriendList(nickname);
+        for(String friend : friendList) {
+            String img = processImage(friend, profileRepository.getProfileImage(friend));
+            UserInfoMinimumDto userInfo = new UserInfoMinimumDto(friend, img);
+            friendInfoList.add(userInfo);
+        }
+
+        return friendInfoList;
+    }
+
+    public List<UserInfoMinimumDto> getBlockInfoList(String nickname) {
+        List<UserInfoMinimumDto> blockInfoList = new ArrayList<>();
+        List<String> blockList = profileRepository.getBlockList(nickname);
+        for(String block : blockList) {
+            String img = processImage(block, profileRepository.getProfileImage(block));
+            UserInfoMinimumDto userInfo = new UserInfoMinimumDto(block, img);
+            blockInfoList.add(userInfo);
+        }
+
+        return blockInfoList;
+    }
+
+    public List<UserInfoMinimumDto> getPickInfoList(String nickname) {
+        List<UserInfoMinimumDto> pickInfoList = new ArrayList<>();
+        List<String> pickList = profileRepository.getPickList(nickname);
+        for(String pick : pickList) {
+            String img = processImage(pick, profileRepository.getProfileImage(pick));
+            UserInfoMinimumDto userInfo = new UserInfoMinimumDto(pick, img);
+            pickInfoList.add(userInfo);
+        }
+
+        return pickInfoList;
     }
 }

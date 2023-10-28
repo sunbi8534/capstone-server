@@ -1,6 +1,7 @@
 package Capstone.server.Controller;
 
 import Capstone.server.DTO.Profile.DepartmentDto;
+import Capstone.server.DTO.Profile.UserInfoMinimumDto;
 import Capstone.server.DTO.Profile.UserProfileInfoDto;
 import Capstone.server.DTO.Profile.UserProfileInfoForShowDto;
 import Capstone.server.Service.ProfileService;
@@ -125,5 +126,23 @@ public class ProfileController {
                            @RequestBody String otherNickname) {
         profileService.setBlock(nickname, otherNickname);
         return "ok";
+    }
+
+    @ResponseBody
+    @GetMapping("/user/profile/friend")
+    public List<UserInfoMinimumDto> getFriends(@RequestParam String nickname) {
+        return profileService.getFriendInfoList(nickname);
+    }
+
+    @ResponseBody
+    @GetMapping("/user/profile/block")
+    public List<UserInfoMinimumDto> getBlocks(@RequestParam String nickname) {
+        return profileService.getBlockInfoList(nickname);
+    }
+
+    @ResponseBody
+    @GetMapping("/user/profile/pick")
+    public List<UserInfoMinimumDto> getPicks(@RequestParam String nickname) {
+        return profileService.getPickInfoList(nickname);
     }
 }
