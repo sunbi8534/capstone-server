@@ -1,4 +1,4 @@
-package Capstone.server.DTO.Chat;
+package Capstone.server.DTO.Etc;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -7,11 +7,10 @@ import lombok.Setter;
 @AllArgsConstructor
 @Getter
 @Setter
-public class SendMsgDto {
+public class AlarmDto {
+    String alarmName;
     String sender;
-    String receiver;
-    String type;
-    String msg;
-    String img;
     String time;
+    String description;
+    String content;
 }

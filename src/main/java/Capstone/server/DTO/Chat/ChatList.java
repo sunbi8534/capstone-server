@@ -2,16 +2,11 @@ package Capstone.server.DTO.Chat;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.Setter;
 
 @AllArgsConstructor
 @Getter
-@Setter
-public class Msg {
+public class ChatList {
+    String friendNickname;
     int msg_num;
-    String nickname;
-    String type;
-    String msg;
-    String image;
-    String time;
+    int chatTableKey;
 }

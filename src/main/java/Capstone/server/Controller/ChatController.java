@@ -1,5 +1,6 @@
 package Capstone.server.Controller;
 
+import Capstone.server.DTO.Chat.ChatListDto;
 import Capstone.server.DTO.Chat.ChatMemberDto;
 import Capstone.server.DTO.Chat.MsgDto;
 import Capstone.server.DTO.Chat.SendMsgDto;
@@ -38,5 +39,11 @@ public class ChatController {
     @PostMapping("/chat/outChat")
     public void outChat(@RequestBody ChatMemberDto chatMember) {
         chatService.outChat(chatMember);
+    }
+
+    @ResponseBody
+    @GetMapping("chat/list")
+    public List<ChatListDto> getChatList(@RequestParam String nickname) {
+        return chatService.getChatList(nickname);
     }
 }

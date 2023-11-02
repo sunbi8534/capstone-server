@@ -1,9 +1,6 @@
 package Capstone.server.Service;
 
-import Capstone.server.DTO.Chat.ChatMemberDto;
-import Capstone.server.DTO.Chat.Msg;
-import Capstone.server.DTO.Chat.MsgDto;
-import Capstone.server.DTO.Chat.SendMsgDto;
+import Capstone.server.DTO.Chat.*;
 import Capstone.server.Repository.ChatRepository;
 import org.springframework.stereotype.Service;
 
@@ -33,7 +30,7 @@ public class ChatService {
                 profileImg = userProfileImg;
             else
                 profileImg = friendProfileImg;
-            MsgDto msgDto = new MsgDto(msg.getNickname(), profileImg, msg.getType(), msg.getMsg(), msg.getImage());
+            MsgDto msgDto = new MsgDto(msg.getNickname(), profileImg, msg.getType(), msg.getMsg(), msg.getImage(), msg.getTime());
             msgDtos.add(msgDto);
         }
         chatRepository.setChatIsOn(nickname1, nickname2, true);
@@ -62,7 +59,7 @@ public class ChatService {
                 profileImg = userProfileImg;
             else
                 profileImg = friendProfileImg;
-            MsgDto msgDto = new MsgDto(msg.getNickname(), profileImg, msg.getType(), msg.getMsg(), msg.getImage());
+            MsgDto msgDto = new MsgDto(msg.getNickname(), profileImg, msg.getType(), msg.getMsg(), msg.getImage(), msg.getTime());
             unreadMsg.add(msgDto);
         }
         return unreadMsg;
@@ -70,5 +67,9 @@ public class ChatService {
 
     public void outChat(ChatMemberDto chatMember) {
         chatRepository.setChatIsOn(chatMember.getNickname1(), chatMember.getNickname2(), false);
+    }
+
+    public List<ChatListDto> getChatList(String nickname) {
+        return chatRepository.getChatList(nickname);
     }
 }

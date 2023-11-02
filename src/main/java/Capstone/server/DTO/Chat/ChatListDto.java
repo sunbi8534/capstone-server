@@ -7,11 +7,9 @@ import lombok.Setter;
 @AllArgsConstructor
 @Getter
 @Setter
-public class Msg {
-    int msg_num;
+public class ChatListDto {
     String nickname;
-    String type;
-    String msg;
-    String image;
     String time;
+    String msg;
+    Boolean alarm;
 }

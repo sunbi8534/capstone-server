@@ -145,4 +145,10 @@ public class ProfileController {
     public List<UserInfoMinimumDto> getPicks(@RequestParam String nickname) {
         return profileService.getPickInfoList(nickname);
     }
+
+    @ResponseBody
+    @GetMapping("/user/profile/course")
+    public List<String> getUserCourse(@RequestParam String nickname) {
+        return profileService.getUserCourse(nickname);
+    }
 }

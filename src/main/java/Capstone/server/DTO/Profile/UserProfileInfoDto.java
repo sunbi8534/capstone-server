@@ -32,7 +32,7 @@ public class UserProfileInfoDto {
         this.setStudyCnt(userProfileInfo.getStudy_cnt());
     }
 
-    public void setUserCourseInfo(ProfileRepository.UserCourseInfo userCourseInfo) {
+    public void setUserCourseInfo(UserCourseInfo userCourseInfo) {
         this.setCurrentCourses(userCourseInfo.getCurrentCourses());
         this.setPastCourses(userCourseInfo.getPastCourses());
     }

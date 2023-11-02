@@ -1,10 +1,10 @@
 package Capstone.server.Repository;
 
-import Capstone.server.DTO.Chat.Msg;
-import Capstone.server.DTO.Chat.SendMsgDto;
+import Capstone.server.DTO.Chat.*;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Repository
@@ -19,10 +19,10 @@ public class ChatRepository {
             makeNewChat(nickname1, nickname2);
 
         String chatRoomName = getChatRoomName(nickname1, nickname2);
-        String getMsgSql = "select msg_num, nickname, type, msg, image from ?";
+        String getMsgSql = "select msg_num, nickname, type, msg, image, time from ?";
         List<Msg> msgs = jdbcTemplate.query(getMsgSql, (rs, rowNum) -> {
             return new Msg(rs.getInt("msg_num"), rs.getString("nickname"), rs.getString("type"),
-                    rs.getString("msg"), rs.getString("image"));
+                    rs.getString("msg"), rs.getString("image"), rs.getString("time"));
         });
 
         if(msgs.isEmpty()) {
@@ -41,10 +41,10 @@ public class ChatRepository {
         String chatRoomName = getChatRoomName(nickname1, nickname2);
         int readMsgNum = getReadMsgNum(nickname1, nickname2);
 
-        String getUnreadMsgSql = "select msg_num, nickname, type, msg, image from ? where msg_num > ? order by msg_num asc;";
+        String getUnreadMsgSql = "select msg_num, nickname, type, msg, image, time from ? where msg_num > ? order by msg_num asc;";
         List<Msg> msgs = jdbcTemplate.query(getUnreadMsgSql, (rs, rowNum) -> {
             return new Msg(rs.getInt("msg_num"), rs.getString("nickname"),
-                    rs.getString("type"), rs.getString("msg"), rs.getString("image"));
+                    rs.getString("type"), rs.getString("msg"), rs.getString("image"), rs.getString("time"));
         }, chatRoomName, readMsgNum);
 
         return msgs;
@@ -62,9 +62,9 @@ public class ChatRepository {
 
     public void updateSendMsg(SendMsgDto sendMsg) {
         String chatRoomName = getChatRoomName(sendMsg.getSender(), sendMsg.getReceiver());
-        String updateSendMsgSql = "insert into ? (nickname, type, msg, image) values (?, ?, ?, ?);";
+        String updateSendMsgSql = "insert into ? (nickname, type, msg, image, time) values (?, ?, ?, ?, ?);";
         jdbcTemplate.update(updateSendMsgSql, chatRoomName, sendMsg.getSender(),
-                sendMsg.getType(), sendMsg.getMsg(), sendMsg.getImg());
+                sendMsg.getType(), sendMsg.getMsg(), sendMsg.getImg(), sendMsg.getTime());
     }
 
     public void updateMsgNum(String nickname1, String nickname2, int updateMsgNum) {
@@ -108,7 +108,7 @@ public class ChatRepository {
         //chat_ + key의 값을 가진 실질적인 대화가 담기는 테이블 생성
         String chatRoomName = "chat_" + String.valueOf(keyNum);
         String makeChatSql = "create table ? (msg_num integer, nickname varchar, type varchar," +
-                " msg varchar, image varchar, primary key(msg_num));";
+                " msg varchar, image varchar, time varchar, primary key(msg_num));";
         jdbcTemplate.update(makeChatSql, chatRoomName);
     }
 
@@ -128,4 +128,37 @@ public class ChatRepository {
     public void sendAlarm(SendMsgDto sendMsg) {
 
     }
+
+    public List<ChatListDto> getChatList(String nickname) {
+        List<ChatListDto> chatList = new ArrayList<>();
+        String getChatListSql = "select friend_nickname, msg_num, chat_table_key from chat_in where nickname = ?;";
+        List<ChatList> list = jdbcTemplate.query(getChatListSql, (rs, rowNum) -> {
+            return new ChatList(rs.getString("friend_nickname"), rs.getInt("msg_num"),
+                    rs.getInt("chat_table_key"));
+        }, nickname);
+
+        String getAlarmSql = "select msg_num from chat_in where nickname = ? and friend_nickname = ?;";
+        String getMsgSql = "select msg, time from ? where msg_num = ?;";
+        for(ChatList l : list) {
+            List<Integer> num = jdbcTemplate.query(getAlarmSql, (rs, rowNum) -> {
+                return Integer.valueOf(rs.getInt("msg_num"));
+            }, l.getFriendNickname(), nickname);
+            int friendMsgNum = num.get(0);
+            Boolean alarm = false;
+            if(friendMsgNum != l.getMsg_num())
+                alarm = true;
+
+            String roomName = "chat_" + l.getChatTableKey();
+            List<MiniMsg> miniMsg = jdbcTemplate.query(getMsgSql, (rs, rowNum) -> {
+                return new MiniMsg(rs.getString("msg"), rs.getString("time"));
+            }, roomName, l.getMsg_num());
+            MiniMsg m = miniMsg.get(0);
+            ChatListDto chatListDto = new ChatListDto(l.getFriendNickname(), m.getTime(), m.getMsg(), alarm);
+            chatList.add(chatListDto);
+        }
+
+        return chatList;
+    }
+
+
 }

@@ -1,10 +1,7 @@
 package Capstone.server.Service;
 
 import Capstone.server.DTO.Chat.ChatMemberDto;
-import Capstone.server.DTO.Profile.DepartmentDto;
-import Capstone.server.DTO.Profile.UserInfoMinimumDto;
-import Capstone.server.DTO.Profile.UserProfileInfoDto;
-import Capstone.server.DTO.Profile.UserProfileInfoForShowDto;
+import Capstone.server.DTO.Profile.*;
 import Capstone.server.Repository.ProfileRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -166,5 +163,13 @@ public class ProfileService {
 
     public String getProfileImage(String nickname) {
         return processImage(nickname, profileRepository.getProfileImage(nickname));
+    }
+
+    public List<String> getUserCourse(String nickname) {
+        UserCourseInfo userCourse = profileRepository.getUserCourseInfo(nickname);
+        List<String> course = new ArrayList<>();
+        course.addAll(userCourse.getPastCourses());
+        course.addAll(userCourse.getCurrentCourses());
+        return course;
     }
 }

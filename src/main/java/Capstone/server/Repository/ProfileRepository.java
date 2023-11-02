@@ -1,6 +1,7 @@
 package Capstone.server.Repository;
 
 import Capstone.server.DTO.Profile.DepartmentDto;
+import Capstone.server.DTO.Profile.UserCourseInfo;
 import Capstone.server.DTO.Profile.UserProfileInfoDto;
 import Capstone.server.DTO.Profile.UserProfileInfoForShowDto;
 import lombok.AllArgsConstructor;
@@ -200,14 +201,6 @@ public class ProfileRepository {
         Boolean is_pick;
         Boolean is_friend;
         Boolean is_block;
-    }
-
-    @AllArgsConstructor
-    @Getter
-    @Setter
-    public class UserCourseInfo {
-        List<String> currentCourses;
-        List<String> pastCourses;
     }
 
     @AllArgsConstructor

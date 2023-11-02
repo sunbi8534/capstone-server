@@ -13,4 +13,5 @@ public class MsgDto {
     String type;   //메세지 유형이 이미지인지 문자인지
     String msg;
     String image;   //이미지 파일을 base64로 인코딩한 문자열
+    String time;
 }

@@ -1,17 +1,14 @@
-package Capstone.server.DTO.Chat;
+package Capstone.server.DTO.Qa;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.Setter;
 
 @AllArgsConstructor
 @Getter
-@Setter
-public class Msg {
-    int msg_num;
+public class QaSendMsgDto {
     String nickname;
     String type;
     String msg;
-    String image;
+    String img;
     String time;
 }
