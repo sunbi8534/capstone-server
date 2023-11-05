@@ -2,5 +2,5 @@ spring:
   datasource:
     url: "jdbc:mysql://localhost/CAPSTONE"
     username: "root"
-    password: "PMd+ln7s6%/v"
+    password: "9845cbJ!@#~"
     driver-class-name: com.mysql.cj.jdbc.Driver
