@@ -42,7 +42,7 @@ public class QaController {
 
     @ResponseBody
     @PostMapping("/qa/giveup/{qaKey}")
-    public void qaGiveUp(@PathVariable int qaKey, @RequestBody String nickname) {
+    public void qaGiveUp(@PathVariable int qaKey, @RequestParam String nickname) {
         qaService.qaGiveUp(qaKey, nickname);
     }
 

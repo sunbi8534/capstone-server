@@ -20,7 +20,7 @@ public class EnrollRepository {
     }
 
     public Boolean checkDuplicateEmail(String email) {
-        String sql = "select email from user where user = ?;";
+        String sql = "select email from user where email = ?;";
         List<String> emails = jdbcTemplate.query(sql, (rs, rowNum) -> {
             return new String(rs.getString("email"));
         }, email);
@@ -44,8 +44,9 @@ public class EnrollRepository {
     }
 
     public List<String> findCourse(String keyword) {
+        keyword = "%" + keyword + "%";
         String findCourseSql = "select course_name from course where course_" +
-                "name like '%?%' or professor like '%?%' or major_and_area like '%?%'";
+                "name like ? or professor like ? or major_and_area like ?;";
         List<String> courses = jdbcTemplate.query(findCourseSql, (rs, rowNum) -> {
             return new String(rs.getString("course_name"));
         }, keyword);
@@ -54,7 +55,8 @@ public class EnrollRepository {
     }
 
     public List<String> findDepartment(String keyword) {
-        String findDeptSql = "select dept_name from department where dept_name like '%?%';";
+        keyword = "%" + keyword + "%";
+        String findDeptSql = "select dept_name from department where dept_name like ?;";
         List<String> departments = jdbcTemplate.query(findDeptSql, (rs, rowNum) -> {
             return new String(rs.getString("dept_name"));
         }, keyword);
@@ -63,16 +65,17 @@ public class EnrollRepository {
     }
 
     public void enrollUser(UserDto userDto) {
+        System.out.println(userDto.toString());
         String enrollUserSql = "insert into user (nickname, email, password, introduction," +
-                "profile_image_path, point, study_cnt) values (?, ?, ?, ?, ?, ?, ?);";
+                " profile_image, point, study_cnt) values (?, ?, ?, ?, ?, ?, ?);";
         String insertMajorSql = "insert into major_in (nickname, dept_name1, dept_name2) " +
-                "values (?, ?, ?, ?);";
+                "values (?, ?, ?);";
         String insertTakeSql = "insert into take (nickname, course_name, is_now, is_past, is_pick) " +
                 "values (?, ?, ?, ?, ?);";
 
         String passwordHash = utilService.makeHashcode(userDto.getPassword());
         jdbcTemplate.update(enrollUserSql, userDto.getNickname(), userDto.getEmail(), passwordHash,
-                "", "", 0, 0);
+                null, null, 0, 0);
         jdbcTemplate.update(insertMajorSql, userDto.getNickname(), userDto.getDept_name1(), userDto.getDept_name2());
         for (String course_name : userDto.getCourse_name())
             jdbcTemplate.update(insertTakeSql, userDto.getNickname(), course_name, true, false, false);

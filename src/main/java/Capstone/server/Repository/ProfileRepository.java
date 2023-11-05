@@ -19,7 +19,7 @@ public class ProfileRepository {
         this.jdbcTemplate = jdbcTemplate;
     }
     public DepartmentDto getDepartmentInfo(String nickname) {
-        String findDeptSql = "select dept_name1, dept_name2 from major_in where name = ?;";
+        String findDeptSql = "select dept_name1, dept_name2 from major_in where nickname = ?;";
         List<DepartmentDto> departments = jdbcTemplate.query(findDeptSql, (rs, rowNum) -> {
             return new DepartmentDto(rs.getString("dept_name1"),
                     rs.getString("dept_name2"));
@@ -29,8 +29,8 @@ public class ProfileRepository {
     }
 
     public UserProfileInfo getUserProfileInfo(String nickname) {
-        String findUserProfielSql = "select introductio, profile_image_path, point, study_cnt from user where name = ?;";
-        List<UserProfileInfo> userInfo = jdbcTemplate.query(findUserProfielSql, (rs, rowNum) -> {
+        String findUserProfileSql = "select introduction, profile_image, point, study_cnt from user where nickname = ?;";
+        List<UserProfileInfo> userInfo = jdbcTemplate.query(findUserProfileSql, (rs, rowNum) -> {
             return new UserProfileInfo(rs.getString("introduction"),
                     rs.getString("profile_image"),
                     rs.getInt("point"),
@@ -54,19 +54,19 @@ public class ProfileRepository {
     }
 
     public int getUserAskCount(String nickname) {
-        String findAskCountSql = "select qa_key from handle where nickname = ? and is_ask = true;";
+        String findAskCountSql = "select qa_key from handle_ask where nickname = ?;";
         List<Integer> counts = jdbcTemplate.query(findAskCountSql, (rs, rowNum) -> {
             return Integer.valueOf(rs.getInt("qa_key"));
-        });
+        }, nickname);
 
         return counts.size();
     }
 
     public int getUserAnswerCount(String nickname) {
-        String findAnswerCountSql = "select qa_key from handle where nickname = ? and is_answer = true;";
+        String findAnswerCountSql = "select qa_key from handle_answer where nickname = ?;";
         List<Integer> counts = jdbcTemplate.query(findAnswerCountSql, (rs, rowNum) -> {
             return Integer.valueOf(rs.getInt("qa_key"));
-        });
+        }, nickname);
 
         return counts.size();
     }
@@ -74,6 +74,11 @@ public class ProfileRepository {
     public void setIntroduction(String nickname, String introduction) {
         String setIntroductionSql = "update user set introduction = ? where nickname = ?;";
         jdbcTemplate.update(setIntroductionSql, introduction, nickname);
+    }
+
+    public void setProfileImage(String nickname, String image) {
+        String setImageSql = "update user set profile_image = ? where nickname = ?;";
+        jdbcTemplate.update(setImageSql, image, nickname);
     }
 
     public void setNowCourseToPast(String nickname, String courseName) {
@@ -106,18 +111,19 @@ public class ProfileRepository {
     }
 
     public int getUserHavingPoint(String nickname) {
-        String getUserHaingPointSql = "select point from user where nickname = ?;";
-        List<Integer> point = jdbcTemplate.query(getUserHaingPointSql, (rs, rowNum) -> {
+        String getUserHavingPointSql = "select point from user where nickname = ?;";
+        List<Integer> point = jdbcTemplate.query(getUserHavingPointSql, (rs, rowNum) -> {
             return Integer.valueOf(rs.getInt("point"));
-        });
+        }, nickname);
 
         return point.get(0);
     }
 
     public void userQuit(String nickname) {
         String[] userQuitSql = {"delete from user where nickname = ?;", "delete from take where nickname = ?;",
-        "delete from major_in where nickname = ?;", "delete from handle where nickname = ?;",
-        "delete from relationship where nickname = ?;", "delete from alarm where nickname = ?;",
+        "delete from major_in where nickname = ?;", "delete from handle_ask where nickname = ?;",
+                "delete from handle_answer where nickname = ?;", "delete from handle_giveup where nickname = ?;",
+        "delete from relationship where nickname = ? or other_nickname = ?;", "delete from alarm where nickname = ?;",
         "delete from report where nickname = ?;", "delete from notify where nickname = ?;"};
 
         for(String sql : userQuitSql) {
@@ -143,11 +149,12 @@ public class ProfileRepository {
         String checkRelationshipSql = "select nickname from relationship where nickname = ? and other_nickname = ?;";
         List<String> result = jdbcTemplate.query(checkRelationshipSql, (rs, rowNum) -> {
             return new String(rs.getString("nickname"));
-        });
+        }, nickname, otherNickname);
 
         if (result.isEmpty()) {
             String makeRelationshipSql = "insert into relationship (nickname, other_nickname, is_pick, is_friend, is_block) values" +
                     " (?, ?, false, false, false);";
+            jdbcTemplate.update(makeRelationshipSql, nickname, otherNickname);
             return false;
         }
         return true;
@@ -155,14 +162,36 @@ public class ProfileRepository {
 
     public void setRelationship(String nickname, String otherNickname, String relation) {
         checkRelationship(nickname, otherNickname);
-        String getRelationshipSql = "select ? from relationship where nickname = ? and other_nickname = ?;";
+        String getRelationshipSql = null;
+        String updateSql = null;
+        String pickSql = "select is_pick from relationship where nickname = ? and other_nickname = ?;";
+        String friendSql = "select is_friend from relationship where nickname = ? and other_nickname = ?;";
+        String blockSql = "select is_block from relationship where nickname = ? and other_nickname = ?;";
+
+        String pickUpdate = "update relationship set is_pick = ? where nickname = ? and other_nickname = ?;";
+        String friendUpdate = "update relationship set is_friend = ? where nickname = ? and other_nickname = ?;";
+        String blockUpdate = "update relationship set is_block = ? where nickname = ? and other_nickname = ?;";
+        if(relation.equals("is_pick")) {
+            getRelationshipSql = pickSql;
+            updateSql = pickUpdate;
+        } else if(relation.equals("is_friend")) {
+            getRelationshipSql = friendSql;
+            updateSql = friendUpdate;
+        } else if(relation.equals("is_block")) {
+            getRelationshipSql = blockSql;
+            updateSql = blockUpdate;
+        }
+
         List<Boolean> r = jdbcTemplate.query(getRelationshipSql, (rs, rowNum) -> {
             return Boolean.valueOf(rs.getBoolean(relation));
-        });
+        }, nickname, otherNickname);
 
         Boolean value = r.get(0);
-        String sql = "update relationship set ? = ? where nickname = ? and other_nickname = ?;";
-        jdbcTemplate.update(sql, relation, !value, nickname, otherNickname);
+        if(value == false && relation.equals("is_block")) {
+            jdbcTemplate.update(pickUpdate, false, nickname, otherNickname);
+            jdbcTemplate.update(friendUpdate, false, nickname, otherNickname);
+        }
+        jdbcTemplate.update(updateSql, !value, nickname, otherNickname);
     }
 
     public List<String> getFriendList(String nickname) {
@@ -187,12 +216,19 @@ public class ProfileRepository {
     }
 
     public String getProfileImage(String nickname) {
-        String getProfileImagePathSql = "select profile_image_path from user where nickname = ?;";
-        List<String> imagePath = jdbcTemplate.query(getProfileImagePathSql, (rs, rowNum) -> {
-            return new String(rs.getString("profile_image_path"));
+        String getProfileImageSql = "select profile_image from user where nickname = ?;";
+        List<String> image = jdbcTemplate.query(getProfileImageSql, (rs, rowNum) -> {
+            String value = rs.getString("profile_image");
+            if(value != null)
+                return value;
+            else
+                return null;
         }, nickname);
 
-        return imagePath.get(0);
+        if(image.isEmpty())
+            return null;
+        else
+            return image.get(0);
     }
 
     @AllArgsConstructor
@@ -208,7 +244,7 @@ public class ProfileRepository {
     @Setter
     public class UserProfileInfo {
         String introduction;
-        String profile_image_path;
+        String profile_image;
         int point;
         int study_cnt;
     }

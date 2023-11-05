@@ -1,9 +1,6 @@
 package Capstone.server.Controller;
 
-import Capstone.server.DTO.Profile.DepartmentDto;
-import Capstone.server.DTO.Profile.UserInfoMinimumDto;
-import Capstone.server.DTO.Profile.UserProfileInfoDto;
-import Capstone.server.DTO.Profile.UserProfileInfoForShowDto;
+import Capstone.server.DTO.Profile.*;
 import Capstone.server.Service.ProfileService;
 import org.springframework.web.bind.annotation.*;
 
@@ -32,7 +29,7 @@ public class ProfileController {
     @ResponseBody
     @PostMapping("/user/profile/setImage/{nickname}")
     public String setImage(@PathVariable("nickname") String nickname,
-                           @RequestBody String image) {
+                           @RequestParam String image) {
 
         profileService.storeProfileImage(nickname, image);
         return "ok";
@@ -41,8 +38,7 @@ public class ProfileController {
     @ResponseBody
     @PostMapping("/user/profile/setIntroduction/{nickname}")
     public String setIntroduction(@PathVariable("nickname") String nickname,
-                                  @RequestBody String introduction) {
-
+                                  @RequestParam String introduction) {
         profileService.setIntroduction(nickname, introduction);
         return "ok";
     }
@@ -50,7 +46,7 @@ public class ProfileController {
     @ResponseBody
     @PostMapping("/user/profile/nowToPastCourse/{nickname}")
     public String changeCourseNowToPast(@PathVariable("nickname") String nickname,
-                                        @RequestBody String courseName) {
+                                        @RequestParam String courseName) {
         profileService.setNowCourseToPast(nickname, courseName);
         return "ok";
     }
@@ -58,7 +54,7 @@ public class ProfileController {
     @ResponseBody
     @PostMapping("/user/profile/PastToNowCourse/{nickname}")
     public String changeCoursePastToNow(@PathVariable("nickname") String nickname,
-                                        @RequestBody String courseName) {
+                                        @RequestParam String courseName) {
         profileService.setPastCourseToNow(nickname, courseName);
         return "ok";
     }
@@ -75,18 +71,17 @@ public class ProfileController {
     @ResponseBody
     @PostMapping("/user/profile/setCourse/{nickname}")
     public String setCourse(@PathVariable("nickname") String nickname,
-                            @RequestBody List<String> course) {
-
-        profileService.setCourse(nickname, course);
+                            @RequestBody CourseDto course) {
+        profileService.setCourse(nickname, course.getCourse());
         return "ok";
     }
 
     @ResponseBody
     @PostMapping("/user/profile/removeCourse/{nickname}")
     public String deleteCourse(@PathVariable("nickname") String nickname,
-                               @RequestBody List<String> course) {
+                               @RequestBody CourseDto courseDto) {
 
-        profileService.deleteCourse(nickname, course);
+        profileService.deleteCourse(nickname, courseDto.getCourse());
         return "ok";
     }
 
@@ -98,7 +93,7 @@ public class ProfileController {
 
     @ResponseBody
     @PostMapping("/user/quit")
-    public String userQuit(@RequestBody String nickname) {
+    public String userQuit(@RequestParam String nickname) {
 
         profileService.userQuit(nickname);
         return "ok";
@@ -107,7 +102,7 @@ public class ProfileController {
     @ResponseBody
     @PostMapping("/user/profile/setPick/{nickname}")
     public String setPick(@PathVariable("nickname") String nickname,
-                          @RequestBody String otherNickname) {
+                          @RequestParam String otherNickname) {
         profileService.setPick(nickname, otherNickname);
         return "ok";
     }
@@ -115,7 +110,7 @@ public class ProfileController {
     @ResponseBody
     @PostMapping("/user/profile/setFriend/{nickname}")
     public String setFriend(@PathVariable("nickname") String nickname,
-                            @RequestBody String otherNickname) {
+                            @RequestParam String otherNickname) {
         profileService.setFriend(nickname, otherNickname);
         return "ok";
     }
@@ -123,7 +118,7 @@ public class ProfileController {
     @ResponseBody
     @PostMapping("/user/profile/setBlock/{nickname}")
     public String setBlock(@PathVariable("nickname") String nickname,
-                           @RequestBody String otherNickname) {
+                           @RequestParam String otherNickname) {
         profileService.setBlock(nickname, otherNickname);
         return "ok";
     }

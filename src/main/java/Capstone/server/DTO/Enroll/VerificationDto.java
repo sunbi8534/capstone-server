@@ -11,6 +11,6 @@ import lombok.Setter;
 @Setter
 public class VerificationDto {
     String verificationHashcode;
-    long EpochSecond;
+    long epochSecond;
     String msg;
 }

@@ -28,6 +28,7 @@ public class EnrollService {
 
     public Boolean checkVerificationHashcode(VerificationCheckDto checkDto) {
         String code = checkDto.getEmail() + Integer.toString(checkDto.getVerificationNum()) + "7101";
+        System.out.println(code);
         String hashcode = utilService.makeHashcode(code);
         if (hashcode.equals(checkDto.getVerificationHashcode()))
             return true;
@@ -37,7 +38,6 @@ public class EnrollService {
 
     public Boolean checkVerificationTime(long previousEpochSecond) {
         long currentEpochSecond = Instant.now().getEpochSecond();
-
         if(currentEpochSecond - previousEpochSecond <= 300)
             return true;
         else

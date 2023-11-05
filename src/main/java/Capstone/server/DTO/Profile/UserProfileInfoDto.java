@@ -4,6 +4,7 @@ import Capstone.server.Repository.ProfileRepository;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Getter
@@ -21,13 +22,14 @@ public class UserProfileInfoDto {
     int studyCnt;
 
     public void setDepartments(DepartmentDto departments) {
+        this.departments = new ArrayList<>();
         this.departments.add(departments.getDept_name1());
         this.departments.add(departments.getDept_name2());
     }
 
     public void setUserInfo(ProfileRepository.UserProfileInfo userProfileInfo) {
         this.setIntroduction(userProfileInfo.getIntroduction());
-        this.setProfileImage(userProfileInfo.getProfile_image_path());
+        this.setProfileImage(userProfileInfo.getProfile_image());
         this.setPoint(userProfileInfo.getPoint());
         this.setStudyCnt(userProfileInfo.getStudy_cnt());
     }

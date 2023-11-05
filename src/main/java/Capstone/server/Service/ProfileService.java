@@ -1,20 +1,10 @@
 package Capstone.server.Service;
 
-import Capstone.server.DTO.Chat.ChatMemberDto;
 import Capstone.server.DTO.Profile.*;
 import Capstone.server.Repository.ProfileRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.util.Base64Utils;
-
-import javax.imageio.ImageIO;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.nio.file.Files;
 import java.util.ArrayList;
-import java.util.Base64;
 import java.util.List;
 
 @Service
@@ -27,7 +17,7 @@ public class ProfileService {
         UserProfileInfoDto userInfo = new UserProfileInfoDto();
         userInfo.setDepartments(profileRepository.getDepartmentInfo(nickname));
         userInfo.setUserInfo(profileRepository.getUserProfileInfo(nickname));
-        userInfo.setProfileImage(processImage(nickname, userInfo.getProfileImage()));
+        userInfo.setProfileImage(profileRepository.getProfileImage(nickname));
         userInfo.setUserCourseInfo(profileRepository.getUserCourseInfo(nickname));
         userInfo.setQuestion(profileRepository.getUserAskCount(nickname));
         userInfo.setAnswer(profileRepository.getUserAnswerCount(nickname));
@@ -40,25 +30,12 @@ public class ProfileService {
         friendInfo.setNickname(friendNickname);
         friendInfo.setDepartments(profileRepository.getDepartmentInfo(friendNickname));
         friendInfo.setUserInfo(profileRepository.getUserProfileInfo(friendNickname));
-        friendInfo.setProfileImage(processImage(friendNickname, friendInfo.getProfileImage()));
+        friendInfo.setProfileImage(profileRepository.getProfileImage(friendNickname));
         friendInfo.setQuestion(profileRepository.getUserAskCount(friendNickname));
         friendInfo.setAnswer(profileRepository.getUserAnswerCount(friendNickname));
         profileRepository.getRelationship(nickname, friendInfo);
 
         return friendInfo;
-    }
-
-    public String processImage(String nickname, String profilePath) {
-        if (profilePath != null) {
-            try {
-                byte[] byteFile = Files.readAllBytes(new File("/profileImage/" + nickname + ".png").toPath());
-                String img = Base64.getEncoder().encodeToString(byteFile);
-                return img;
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        }
-        return null;
     }
 
     @AllArgsConstructor
@@ -69,16 +46,7 @@ public class ProfileService {
     }
 
     public void storeProfileImage(String nickname, String image) {
-        try {
-            byte[] fileData = Base64Utils.decodeFromString(image);
-            String filePath = "/profileImage/" + nickname + ".png";
-            File dest = new File(filePath);
-            FileOutputStream fileOutputStream = new FileOutputStream(dest);
-            fileOutputStream.write(fileData);
-            fileOutputStream.close();
-        } catch(IOException e) {
-            e.printStackTrace();
-        }
+        profileRepository.setProfileImage(nickname, image);
     }
 
     public void setIntroduction(String nickname, String introduction) {
@@ -162,7 +130,7 @@ public class ProfileService {
     }
 
     public String getProfileImage(String nickname) {
-        return processImage(nickname, profileRepository.getProfileImage(nickname));
+        return profileRepository.getProfileImage(nickname);
     }
 
     public List<String> getUserCourse(String nickname) {

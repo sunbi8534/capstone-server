@@ -23,19 +23,20 @@ public class EnrollController {
 
     @ResponseBody
     @GetMapping("/find/department")
-    public List<String> findDepartment(@RequestParam String keyword) {
-        return enrollService.findDepartment(keyword);
+    public List<String> findDepartment(@RequestParam String dept_name) {
+        System.out.println("hello");
+        return enrollService.findDepartment(dept_name);
     }
 
     @ResponseBody
     @GetMapping("/find/course")
-    public List<String> findCourse(@RequestParam String keyword) {
-        return enrollService.findCourse(keyword);
+    public List<String> findCourse(@RequestParam String course) {
+        return enrollService.findCourse(course);
     }
 
     @ResponseBody
     @PostMapping("/user/authenticate")
-    public VerificationDto checkEmailEnroll(@RequestBody String email) {
+    public VerificationDto checkEmailEnroll(@RequestParam String email) {
         VerificationDto verificationDto = new VerificationDto();
         //이메일과 관련해서 에러가 존재한다면
         if(emailService.checkEmailError(email, verificationDto, true))
@@ -47,7 +48,7 @@ public class EnrollController {
 
     @ResponseBody
     @PostMapping("/find/authenticate/pw")
-    public VerificationDto checkEmailPw(@RequestBody String email) {
+    public VerificationDto checkEmailPw(@RequestParam String email) {
         VerificationDto verificationDto = new VerificationDto();
 
         if(emailService.checkEmailError(email, verificationDto, false))
@@ -67,6 +68,7 @@ public class EnrollController {
     @ResponseBody
     @PostMapping("/user/authenticate/check")
     public String checkCode(@RequestBody VerificationCheckDto info) {
+        System.out.println(info.getEpochSecond());
         if (!enrollService.checkVerificationTime(info.getEpochSecond())
         || !enrollService.checkVerificationHashcode(info))
             return "false";
