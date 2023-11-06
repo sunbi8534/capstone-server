@@ -31,8 +31,6 @@ public class ChatRepository {
     public List<Msg> getUnreadMsg(String nickname1, String nickname2) {
         String chatRoomName = getChatRoomName(nickname1, nickname2);
         int readMsgNum = getReadMsgNum(nickname1, nickname2);
-        if(readMsgNum == 0)
-            return null;
 
         String getUnreadMsgSql = "select msg_num, nickname, type, msg, image, time from " + chatRoomName + " where msg_num > ? order by msg_num asc;";
         List<Msg> msgs = jdbcTemplate.query(getUnreadMsgSql, (rs, rowNum) -> {

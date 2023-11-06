@@ -58,7 +58,7 @@ public class ChatService {
         String userProfileImg = profileService.getProfileImage(nickname1);
         String friendProfileImg = profileService.getProfileImage(nickname2);
         List<Msg> msgs = chatRepository.getUnreadMsg(nickname1, nickname2);
-        if(msgs.isEmpty())
+        if(msgs == null)
             return null;
 
         for(Msg msg : msgs) {
