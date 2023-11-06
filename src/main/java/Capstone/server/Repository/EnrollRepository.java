@@ -49,7 +49,7 @@ public class EnrollRepository {
                 "name like ? or professor like ? or major_and_area like ?;";
         List<String> courses = jdbcTemplate.query(findCourseSql, (rs, rowNum) -> {
             return new String(rs.getString("course_name"));
-        }, keyword, keyword, keyword);
+        },  keyword, keyword, keyword);
 
         return courses;
     }
