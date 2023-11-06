@@ -15,37 +15,30 @@ public class ChatRepository {
     }
 
     public List<Msg> getAllMsgs(String nickname1, String nickname2) {
-        if(!checkIsExistChat(nickname1, nickname2))
-            makeNewChat(nickname1, nickname2);
-
         String chatRoomName = getChatRoomName(nickname1, nickname2);
-        String getMsgSql = "select msg_num, nickname, type, msg, image, time from ?";
+        String getMsgSql = "select msg_num, nickname, type, msg, image, time from " + chatRoomName + ";";
         List<Msg> msgs = jdbcTemplate.query(getMsgSql, (rs, rowNum) -> {
             return new Msg(rs.getInt("msg_num"), rs.getString("nickname"), rs.getString("type"),
                     rs.getString("msg"), rs.getString("image"), rs.getString("time"));
         });
 
-        if(msgs.isEmpty()) {
+        if(msgs.isEmpty())
             return null;
-        }
-
-        //chat테이블에서 메세지를 읽었으니 nickname1이 가장 최근에 본 메세지 넘버를 업데이트 해준다.
-        Msg lastMsg = msgs.get(msgs.size() - 1);
-        int updateMsgNum = lastMsg.getMsg_num();
-        updateMsgNum(nickname1, nickname2, updateMsgNum);
-
-        return msgs;
+        else
+            return msgs;
     }
 
     public List<Msg> getUnreadMsg(String nickname1, String nickname2) {
         String chatRoomName = getChatRoomName(nickname1, nickname2);
         int readMsgNum = getReadMsgNum(nickname1, nickname2);
+        if(readMsgNum == 0)
+            return null;
 
-        String getUnreadMsgSql = "select msg_num, nickname, type, msg, image, time from ? where msg_num > ? order by msg_num asc;";
+        String getUnreadMsgSql = "select msg_num, nickname, type, msg, image, time from " + chatRoomName + " where msg_num > ? order by msg_num asc;";
         List<Msg> msgs = jdbcTemplate.query(getUnreadMsgSql, (rs, rowNum) -> {
             return new Msg(rs.getInt("msg_num"), rs.getString("nickname"),
                     rs.getString("type"), rs.getString("msg"), rs.getString("image"), rs.getString("time"));
-        }, chatRoomName, readMsgNum);
+        }, readMsgNum);
 
         return msgs;
     }
@@ -53,17 +46,24 @@ public class ChatRepository {
     public int getReadMsgNum(String nickname1, String nickname2) {
         String getReadMsgNumSql = "select msg_num from chat_in where nickname = ? and friend_nickname = ?;";
         List<Integer> msgNum = jdbcTemplate.query(getReadMsgNumSql, (rs, rowNum) -> {
-            return Integer.valueOf(rs.getInt("msg_num"));
+            Integer v = rs.getInt("msg_num");
+            if(v == null)
+                return null;
+            else
+                return v;
         }, nickname1, nickname2);
 
-        return msgNum.get(0);
+        if(msgNum.isEmpty())
+            return 0;
+        else
+            return msgNum.get(0);
     }
 
 
     public void updateSendMsg(SendMsgDto sendMsg) {
         String chatRoomName = getChatRoomName(sendMsg.getSender(), sendMsg.getReceiver());
-        String updateSendMsgSql = "insert into ? (nickname, type, msg, image, time) values (?, ?, ?, ?, ?);";
-        jdbcTemplate.update(updateSendMsgSql, chatRoomName, sendMsg.getSender(),
+        String updateSendMsgSql = "insert into " + chatRoomName + " (nickname, type, msg, image, time) values (?, ?, ?, ?, ?);";
+        jdbcTemplate.update(updateSendMsgSql, sendMsg.getSender(),
                 sendMsg.getType(), sendMsg.getMsg(), sendMsg.getImg(), sendMsg.getTime());
     }
 
@@ -83,8 +83,12 @@ public class ChatRepository {
     public boolean checkIsExistChat(String nickname1, String nickname2) {
         String checkSql = "select chat_table_key from chat_in where nickname = ? and friend_nickname = ?;";
         List<Integer> key = jdbcTemplate.query(checkSql, (rs, rowNum) -> {
-            return Integer.valueOf(rs.getInt("chat_table_key"));
-        });
+            Integer v = rs.getInt("chat_table_key");
+            if(v == null)
+                return null;
+            else
+                return v;
+        }, nickname1, nickname2);
 
         if(key.isEmpty())
             return false;
@@ -94,22 +98,31 @@ public class ChatRepository {
 
     public void makeNewChat(String nickname1, String nickname2) {
         //chat_in 테이블 내에 정보 생성
-        String sql = "select max(chat_table_key) as key from chat_in;";
+        String sql = "select chat_table_key from chat_in order by chat_table_key asc;";
+        int keyNum;
         List<Integer> maxKey = jdbcTemplate.query(sql, (rs, rowNum) -> {
-            return Integer.valueOf("key");
+            Integer v = rs.getInt("chat_table_key");
+            if(v == null)
+                return null;
+            else
+                return v;
         });
 
-        int keyNum = maxKey.get(0) + 1;
+        if(maxKey.isEmpty())
+            keyNum = 1;
+        else
+            keyNum = maxKey.get(maxKey.size() - 1) + 1;
+
         String makeChatInfoSql = "insert into chat_in (nickname, msg_num, is_on, friend_nickname, chat_table_key) values" +
-                " (?, null, false, ?, ?);";
+                " (?, 0, false, ?, ?);";
         jdbcTemplate.update(makeChatInfoSql, nickname1, nickname2, keyNum);
         jdbcTemplate.update(makeChatInfoSql, nickname2, nickname1, keyNum);
 
         //chat_ + key의 값을 가진 실질적인 대화가 담기는 테이블 생성
         String chatRoomName = "chat_" + String.valueOf(keyNum);
-        String makeChatSql = "create table ? (msg_num integer, nickname varchar, type varchar," +
-                " msg varchar, image varchar, time varchar, primary key(msg_num));";
-        jdbcTemplate.update(makeChatSql, chatRoomName);
+        String makeChatSql = "create table " + chatRoomName + " (msg_num integer AUTO_INCREMENT, nickname varchar(50), type varchar(30)," +
+                " msg text, image text, time varchar(40), primary key(msg_num));";
+        jdbcTemplate.update(makeChatSql);
     }
 
     public void setChatIsOn(String nickname1, String nickname2, boolean isOn) {
@@ -121,7 +134,7 @@ public class ChatRepository {
         String checkUserSql = "select is_on from chat_in where nickname = ? and friend_nickname = ?;";
         List<Boolean> isOn = jdbcTemplate.query(checkUserSql, (rs, rowNum) -> {
             return Boolean.valueOf(rs.getBoolean("is_on"));
-        });
+        }, nickname1, nickname2);
         return isOn.get(0);
     }
 
@@ -138,22 +151,30 @@ public class ChatRepository {
         }, nickname);
 
         String getAlarmSql = "select msg_num from chat_in where nickname = ? and friend_nickname = ?;";
-        String getMsgSql = "select msg, time from ? where msg_num = ?;";
         for(ChatList l : list) {
             List<Integer> num = jdbcTemplate.query(getAlarmSql, (rs, rowNum) -> {
                 return Integer.valueOf(rs.getInt("msg_num"));
             }, l.getFriendNickname(), nickname);
             int friendMsgNum = num.get(0);
             Boolean alarm = false;
-            if(friendMsgNum != l.getMsg_num())
+            if(friendMsgNum > l.getMsg_num())
                 alarm = true;
 
             String roomName = "chat_" + l.getChatTableKey();
+            String getMsgSql = "select msg, time from " + roomName + " where msg_num = ?;";
             List<MiniMsg> miniMsg = jdbcTemplate.query(getMsgSql, (rs, rowNum) -> {
                 return new MiniMsg(rs.getString("msg"), rs.getString("time"));
-            }, roomName, l.getMsg_num());
-            MiniMsg m = miniMsg.get(0);
-            ChatListDto chatListDto = new ChatListDto(l.getFriendNickname(), m.getTime(), m.getMsg(), alarm);
+            }, l.getMsg_num());
+            ChatListDto chatListDto = new ChatListDto();
+            if(miniMsg.isEmpty()) {
+                chatListDto.setNickname(l.getFriendNickname());
+                chatListDto.setTime(null);
+                chatListDto.setMsg(null);
+                chatListDto.setAlarm(alarm);
+            } else {
+                MiniMsg m = miniMsg.get(0);
+                chatListDto = new ChatListDto(l.getFriendNickname(), m.getTime(), m.getMsg(), alarm);
+            }
             chatList.add(chatListDto);
         }
 

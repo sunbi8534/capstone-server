@@ -23,7 +23,13 @@ public class ChatService {
         String userProfileImg = profileService.getProfileImage(nickname1);
         String friendProfileImg = profileService.getProfileImage(nickname2);
 
+        if(!chatRepository.checkIsExistChat(nickname1, nickname2))
+            chatRepository.makeNewChat(nickname1, nickname2);
+
         List<Msg> msgs = chatRepository.getAllMsgs(nickname1, nickname2);
+        if(msgs == null)
+            return msgDtos;
+
         for(Msg msg : msgs) {
             String profileImg;
             if(msg.getNickname().equals(nickname1))
@@ -33,6 +39,10 @@ public class ChatService {
             MsgDto msgDto = new MsgDto(msg.getNickname(), profileImg, msg.getType(), msg.getMsg(), msg.getImage(), msg.getTime());
             msgDtos.add(msgDto);
         }
+
+        Msg lastMsg = msgs.get(msgs.size() - 1);
+        int updateMsgNum = lastMsg.getMsg_num();
+        chatRepository.updateMsgNum(nickname1, nickname2, updateMsgNum);
         chatRepository.setChatIsOn(nickname1, nickname2, true);
         return msgDtos;
     }
@@ -51,8 +61,6 @@ public class ChatService {
         if(msgs.isEmpty())
             return null;
 
-        Msg m = msgs.get(msgs.size() - 1);
-        chatRepository.updateMsgNum(nickname1, nickname2, m.getMsg_num());
         for(Msg msg : msgs) {
             String profileImg;
             if(msg.getNickname().equals(nickname1))
@@ -62,6 +70,10 @@ public class ChatService {
             MsgDto msgDto = new MsgDto(msg.getNickname(), profileImg, msg.getType(), msg.getMsg(), msg.getImage(), msg.getTime());
             unreadMsg.add(msgDto);
         }
+
+        Msg m = msgs.get(msgs.size() - 1);
+        chatRepository.updateMsgNum(nickname1, nickname2, m.getMsg_num());
+
         return unreadMsg;
     }
 
