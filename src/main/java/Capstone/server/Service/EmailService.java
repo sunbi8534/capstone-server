@@ -36,14 +36,21 @@ public class EmailService {
             return true;
         }
         else if (enrollRepository.checkDuplicateEmail(email)) {   //중복되는 이메일이 있는지 체크
-            if (type)
+            if (type) {
                 verificationDto.setMsg("duplicate");
-            else
+                return true;
+            }
+            else {
+                return false;
+            }
+        } else {
+            if (type)
+                return false;
+            else {
                 verificationDto.setMsg("noId");
-            return true;
+                return true;
+            }
         }
-
-        return false;
     }
 
     public boolean checkEmailForm(String email) {
