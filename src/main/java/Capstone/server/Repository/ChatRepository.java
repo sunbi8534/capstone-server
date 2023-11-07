@@ -119,7 +119,7 @@ public class ChatRepository {
         //chat_ + key의 값을 가진 실질적인 대화가 담기는 테이블 생성
         String chatRoomName = "chat_" + String.valueOf(keyNum);
         String makeChatSql = "create table " + chatRoomName + " (msg_num integer AUTO_INCREMENT, nickname varchar(50), type varchar(30)," +
-                " msg text, image text, time varchar(40), primary key(msg_num));";
+                " msg text, image MEDIUMTEXT, time varchar(40), primary key(msg_num));";
         jdbcTemplate.update(makeChatSql);
     }
 
