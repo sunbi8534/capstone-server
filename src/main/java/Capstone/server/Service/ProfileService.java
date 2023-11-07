@@ -45,8 +45,8 @@ public class ProfileService {
         Boolean isBlock;
     }
 
-    public void storeProfileImage(String nickname, String image) {
-        profileRepository.setProfileImage(nickname, image);
+    public void storeProfileImage(String nickname, ImgDto image) {
+        profileRepository.setProfileImage(nickname, image.getImg());
     }
 
     public void setIntroduction(String nickname, String introduction) {

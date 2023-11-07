@@ -29,7 +29,7 @@ public class ProfileController {
     @ResponseBody
     @PostMapping("/user/profile/setImage/{nickname}")
     public String setImage(@PathVariable("nickname") String nickname,
-                           @RequestParam String image) {
+                           @RequestBody ImgDto image) {
 
         profileService.storeProfileImage(nickname, image);
         return "ok";
