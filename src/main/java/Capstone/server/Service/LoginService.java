@@ -30,5 +30,4 @@ LoginService {
 
         return loginResultDto;
     }
-
 }

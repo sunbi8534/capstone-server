@@ -1,4 +1,4 @@
-package Capstone.server.Repository;
+package Capstone.server.DTO.Qa;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
