@@ -13,12 +13,15 @@ public class QaMsgDto {
     String type;
     String msg;
     String img;
-    Boolean isAnonimity;
+    String time;
+    Boolean isAnonymity;
 
-    public QaMsgDto(String nickname, String type, String msg, String img) {
+    public QaMsgDto(String nickname, String type, String msg, String img, String time) {
         this.nickname = nickname;
         this.type = type;
         this.msg = msg;
         this.img = img;
+        this.time = time;
+        this.isAnonymity = false;
     }
 }

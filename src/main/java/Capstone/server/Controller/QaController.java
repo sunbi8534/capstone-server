@@ -1,9 +1,6 @@
 package Capstone.server.Controller;
 
-import Capstone.server.DTO.Qa.QaBriefDto;
-import Capstone.server.DTO.Qa.QaDto;
-import Capstone.server.DTO.Qa.QaMsgDto;
-import Capstone.server.DTO.Qa.QaSendMsgDto;
+import Capstone.server.DTO.Qa.*;
 import Capstone.server.Service.QaService;
 import org.springframework.web.bind.annotation.*;
 
@@ -41,8 +38,8 @@ public class QaController {
     }
 
     @ResponseBody
-    @PostMapping("/qa/giveup/{qaKey}")
-    public void qaGiveUp(@PathVariable int qaKey, @RequestParam String nickname) {
+    @PostMapping("/qa/giveup")
+    public void qaGiveUp(@RequestParam int qaKey, @RequestParam String nickname) {
         qaService.qaGiveUp(qaKey, nickname);
     }
 
@@ -53,7 +50,7 @@ public class QaController {
     }
 
     @ResponseBody
-    @PostMapping("/qa/chat")
+    @PostMapping("/qa/chat/{qaKey}")
     public void sendQaMsg(@PathVariable int qaKey, @RequestBody QaSendMsgDto msg) {
         qaService.sendQaMsg(qaKey, msg);
     }
@@ -62,5 +59,29 @@ public class QaController {
     @GetMapping("/qa/chat")
     public List<QaMsgDto> getQaMsgs(@RequestParam int qaKey, @RequestParam String nickname) {
         return qaService.getQaMsgs(qaKey, nickname);
+    }
+
+    @ResponseBody
+    @PostMapping("/qa/finish")
+    public void qaFinish(@RequestParam int qaKey) {
+        qaService.qaFinish(qaKey);
+    }
+
+    @ResponseBody
+    @GetMapping("/user/qa/ask")
+    public List<QaListDto> getAskList(@RequestParam String nickname) {
+        return qaService.getQaAskList(nickname);
+    }
+
+    @ResponseBody
+    @GetMapping("/user/qa/answer")
+    public List<QaListDto> getAnswerList(@RequestParam String nickname) {
+        return qaService.getQaAnswerList(nickname);
+    }
+
+    @ResponseBody
+    @GetMapping("/user/qa")
+    public List<QaMsgDto> getQa(@RequestParam int qaKey) {
+        return qaService.getQa(qaKey);
     }
 }

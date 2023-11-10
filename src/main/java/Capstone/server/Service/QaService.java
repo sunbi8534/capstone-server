@@ -1,13 +1,9 @@
 package Capstone.server.Service;
 
-import Capstone.server.DTO.Qa.QaBriefDto;
-import Capstone.server.DTO.Qa.QaDto;
-import Capstone.server.DTO.Qa.QaMsgDto;
-import Capstone.server.DTO.Qa.QaSendMsgDto;
+import Capstone.server.DTO.Qa.*;
 import Capstone.server.Repository.QaRepository;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -51,5 +47,21 @@ public class QaService {
 
     public List<QaMsgDto> getQaMsgs(int qaKey, String nickname) {
         return qaRepository.getQaMsgs(qaKey, nickname);
+    }
+
+    public List<QaListDto> getQaAskList(String nickname) {
+        return qaRepository.getQaAskList(nickname);
+    }
+
+    public List<QaListDto> getQaAnswerList(String nickname) {
+        return qaRepository.getQaAnswerList(nickname);
+    }
+
+    public void qaFinish(int qaKey) {
+        qaRepository.qaFinish(qaKey);
+    }
+
+    public List<QaMsgDto> getQa(int qaKey) {
+        return qaRepository.getQa(qaKey);
     }
 }

@@ -178,6 +178,4 @@ public class ChatRepository {
 
         return chatList;
     }
-
-
 }
