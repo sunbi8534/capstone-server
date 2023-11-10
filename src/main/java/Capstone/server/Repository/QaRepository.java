@@ -18,7 +18,7 @@ public class QaRepository {
         this.jdbcTemplate = jdbcTemplate;
         this.profileRepository = profileRepository;
     }
-    public int enrollQa(QaDto q) {
+    public void enrollQa(QaDto q) {
         int myKey;
         String getMynumSql = "select my_key from handle_ask where nickname = ? order by my_key ASC;";
         List<Integer> key = jdbcTemplate.query(getMynumSql, (rs, rowNum) -> {
@@ -30,8 +30,8 @@ public class QaRepository {
         } else
             myKey = key.get(key.size() - 1) + 1;
         String insertQaSql = "insert into qa (my_key, qa_type, course_name, qa_num, point, questioner, solver," +
-                " is_anonymity, is_watching, is_solving, status) values (?, ?, ?, ?, ?, ?, null, ?, false," +
-                " false, false);";
+                " is_anonymity, is_watching, is_solving, status, review) values (?, ?, ?, ?, ?, ?, null, ?, false," +
+                " false, false, 0);";
         jdbcTemplate.update(insertQaSql, myKey, q.getType(), q.getCourse(), q.getMsg().size(), q.getPoint(), q.getNickname(),
                 q.getIsAnonymity());
         String getQaKeySql = "select qa_key from qa where my_key = ? and questioner = ?;";
@@ -56,8 +56,6 @@ public class QaRepository {
 
         String insertHandleAskSql = "insert into handle_ask (nickname, qa_key, my_key) values (?, ?, ?);";
         jdbcTemplate.update(insertHandleAskSql, q.getNickname(), qaKey.get(0), myKey);
-
-        return qaKey.get(0);
     }
 
     public List<QaMsgDto> getQa(int qaKey) {
@@ -169,11 +167,12 @@ public class QaRepository {
         return list;
     }
 
-    public void qaFinish(int qaKey) {
+    public void qaFinish(int qaKey, int review) {
         String sql = "select point, questioner, solver from qa where qa_key = ?;";
         String updateSql1 = "update qa set status = true where qa_key = ?;";
         String addUserPointSql = "update user set point = point + ? where nickname = ?;";
         String minusUserPointSql = "update user set point = point - ? where nickname = ?;";
+        String updateReviewSql = "update qa set review = ? where qa_key = ?;";
 
         List<FinishInfo> finishInfos = jdbcTemplate.query(sql, (rs, rowNum) -> {
             return new FinishInfo(rs.getInt("point"), rs.getString("questioner"),
@@ -184,6 +183,7 @@ public class QaRepository {
         jdbcTemplate.update(updateSql1, qaKey);
         jdbcTemplate.update(addUserPointSql, info.getPoint(), info.getSolver());
         jdbcTemplate.update(minusUserPointSql, info.getPoint(), info.getQuestioner());
+        jdbcTemplate.update(updateReviewSql, review, qaKey);
     }
 
     public boolean isWatching(int qaKey) {
@@ -335,5 +335,17 @@ public class QaRepository {
             jdbcTemplate.update(setSolverSql, lastNum, qaKey);
 
         return msgs;
+    }
+
+    public List<Integer> getUserReview(String nickname) {
+        String getReviewSql = "select review from qa where solver = ? and status = true;";
+        List<Integer> reviewValues = jdbcTemplate.query(getReviewSql, (rs, rowNum) -> {
+            return Integer.valueOf(rs.getInt("review"));
+        }, nickname);
+
+        if (reviewValues.isEmpty())
+            return null;
+        else
+            return reviewValues;
     }
 }

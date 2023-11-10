@@ -4,6 +4,7 @@ import Capstone.server.DTO.Qa.*;
 import Capstone.server.Repository.QaRepository;
 import org.springframework.stereotype.Service;
 
+import java.text.DecimalFormat;
 import java.util.List;
 
 @Service
@@ -17,8 +18,8 @@ public class QaService {
         this.profileService = profileService;
     }
 
-    public int enrollQa(QaDto qaDto) {
-        return qaRepository.enrollQa(qaDto);
+    public void enrollQa(QaDto qaDto) {
+        qaRepository.enrollQa(qaDto);
     }
 
     public String deleteQa(int qaKey) {
@@ -57,11 +58,24 @@ public class QaService {
         return qaRepository.getQaAnswerList(nickname);
     }
 
-    public void qaFinish(int qaKey) {
-        qaRepository.qaFinish(qaKey);
+    public void qaFinish(int qaKey, int review) {
+        qaRepository.qaFinish(qaKey, review);
     }
 
     public List<QaMsgDto> getQa(int qaKey) {
         return qaRepository.getQa(qaKey);
+    }
+
+    public double getUserReview(String nickname) {
+        List<Integer> reviewValue = qaRepository.getUserReview(nickname);
+        int sum = 0;
+        if (reviewValue == null)
+            return 0;
+        else {
+            for(int v : reviewValue)
+                sum += v;
+
+            return (double) sum / reviewValue.size();
+        }
     }
 }
