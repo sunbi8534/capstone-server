@@ -1,6 +1,11 @@
 package Capstone.server.Repository;
 
+import Capstone.server.DTO.Chat.Msg;
+import Capstone.server.DTO.Chat.SendMsgDto;
+import Capstone.server.DTO.Profile.UserInfoMinimumDto;
 import Capstone.server.DTO.Study.*;
+import Capstone.server.Service.ProfileService;
+import Capstone.server.Service.StudyService;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -11,9 +16,12 @@ import java.util.List;
 @Repository
 public class StudyRepository {
     JdbcTemplate jdbcTemplate;
+    ProfileService profileService;
 
-    public StudyRepository(JdbcTemplate jdbcTemplate) {
+    public StudyRepository(JdbcTemplate jdbcTemplate,
+                           ProfileService profileService) {
         this.jdbcTemplate = jdbcTemplate;
+        this.profileService = profileService;
     }
 
     public List<StudyInfoDto> getStudyRoomList(String nickname, RoomStatusDto roomStatus) {
@@ -139,4 +147,80 @@ public class StudyRepository {
 
         return infos;
     }
+
+    public List<UserInfoMinimumDto> enterStudy(int roomKey, String nickname) {
+        String getNicknameSql = "select nickname from study_chat_in where room_key = ?;";
+        List<String> friends = jdbcTemplate.query(getNicknameSql, (rs, rowNum) -> {
+            return new String(rs.getString("nickname"));
+        }, roomKey);
+
+        List<UserInfoMinimumDto> friendInfo = new ArrayList<>();
+        for(String name : friends) {
+            if (nickname.equals(name))
+                continue;
+            friendInfo.add(new UserInfoMinimumDto(name, profileService.getProfileImage(name)));
+        }
+        return friendInfo;
+    }
+
+    public List<Msg> getAllMsgs(int roomKey, String nickname) {
+        String chatRoomName = "study_chat_" + String.valueOf(roomKey);
+        String getMsgSql = "select msg_num, nickname, type, msg, image, time from " + chatRoomName + ";";
+        List<Msg> msgs = jdbcTemplate.query(getMsgSql, (rs, rowNum) -> {
+            return new Msg(rs.getInt("msg_num"), rs.getString("nickname"), rs.getString("type"),
+                    rs.getString("msg"), rs.getString("image"), rs.getString("time"));
+        });
+
+        if(msgs.isEmpty())
+            return null;
+        else
+            return msgs;
+    }
+
+    public void updateMsgNum(int roomKey, int updateMsgNum, String nickname) {
+        String updateMsgNumSql = "update study_chat_in set msg_num = ? where nickname = ? and room_key = ?;";
+        jdbcTemplate.update(updateMsgNumSql, updateMsgNum, nickname, roomKey);
+    }
+
+    public void setChatIsOn(int roomKey, String nickname, boolean isOn) {
+        String setChatOnSql = "update study_chat_in set is_on = ? where nickname = ? and room_key = ?;";
+        jdbcTemplate.update(setChatOnSql, isOn, nickname, roomKey);
+    }
+
+    public void updateSendMsg(StudySendMsgDto sendMsg) {
+        String chatRoomName = "study_chat_" + sendMsg.getRoomKey();
+        String updateSendMsgSql = "insert into " + chatRoomName + " (nickname, type, msg, image, time) values (?, ?, ?, ?, ?);";
+        jdbcTemplate.update(updateSendMsgSql, sendMsg.getSender(),
+                sendMsg.getType(), sendMsg.getMsg(), sendMsg.getImg(), sendMsg.getTime());
+    }
+
+    public List<Msg> getUnreadMsg(int roomKey, String nickname) {
+        String chatRoomName = "study_chat_" + String.valueOf(roomKey);
+        int readMsgNum = getReadMsgNum(roomKey, nickname);
+
+        String getUnreadMsgSql = "select msg_num, nickname, type, msg, image, time from " + chatRoomName + " where msg_num > ? order by msg_num asc;";
+        List<Msg> msgs = jdbcTemplate.query(getUnreadMsgSql, (rs, rowNum) -> {
+            return new Msg(rs.getInt("msg_num"), rs.getString("nickname"),
+                    rs.getString("type"), rs.getString("msg"), rs.getString("image"), rs.getString("time"));
+        }, readMsgNum);
+
+        return msgs;
+    }
+
+    public int getReadMsgNum(int roomKey, String nickname) {
+        String getReadMsgNumSql = "select msg_num from study_chat_in where nickname = ? and room_key = ?;";
+        List<Integer> msgNum = jdbcTemplate.query(getReadMsgNumSql, (rs, rowNum) -> {
+            Integer v = rs.getInt("msg_num");
+            if(v == null)
+                return null;
+            else
+                return v;
+        }, nickname, roomKey);
+
+        if(msgNum.isEmpty())
+            return 0;
+        else
+            return msgNum.get(0);
+    }
 }
+
