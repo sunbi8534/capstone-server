@@ -255,7 +255,7 @@ public class StudyRepository {
     public void outStudy(int roomKey, String nickname) {
         String outSql1 = "update study_info set cur_num = cur_num - 1 where room_key = ?;";
         String outSql2 = "delete from study_chat_in where nickname = ? and room_key = ?;";
-
+        //
         jdbcTemplate.update(outSql1, roomKey);
         jdbcTemplate.update(outSql2, nickname, roomKey);
     }
