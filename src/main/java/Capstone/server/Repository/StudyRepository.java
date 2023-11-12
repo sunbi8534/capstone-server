@@ -5,10 +5,8 @@ import Capstone.server.DTO.Chat.SendMsgDto;
 import Capstone.server.DTO.Profile.UserInfoMinimumDto;
 import Capstone.server.DTO.Study.*;
 import Capstone.server.Service.ProfileService;
-import Capstone.server.Service.StudyService;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
-import org.springframework.web.bind.annotation.PathVariable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,13 +34,21 @@ public class StudyRepository {
         List<StudyInfoDto> studyInfoDtos = new ArrayList<>();
         for(String c : course) {
             List<StudyInfoDto> infos = jdbcTemplate.query(findStudySql, (rs, rowNum) -> {
+                String leader = rs.getString("leader");
                 return new StudyInfoDto(rs.getInt("room_key"), rs.getString("room_name"),
                         rs.getString("course_name"), rs.getInt("max_num"), rs.getInt("cur_num"),
-                        rs.getString("leader"), rs.getString("start_date"), rs.getBoolean("is_open"),
+                        leader, rs.getString("start_date"), rs.getBoolean("is_open"),
                         rs.getString("study_introduction"));
-            }, nickname);
+            }, c);
             studyInfoDtos.addAll(infos);
         }
+
+        List<StudyInfoDto> remove = new ArrayList<>();
+        for(StudyInfoDto s : studyInfoDtos) {
+            if(s.getLeader().equals(nickname))
+                remove.add(s);
+        }
+        studyInfoDtos.removeAll(remove);
 
         if (roomStatus.getIsAll())
             return studyInfoDtos;
@@ -79,7 +85,7 @@ public class StudyRepository {
             return Integer.valueOf(rs.getInt("room_key"));
         }, info.getRoomName());
 
-        String insertChatInSql = "insert into study_chat_in (nickname, msg_num, is_on, roomKey)" +
+        String insertChatInSql = "insert into study_chat_in (nickname, msg_num, is_on, room_key)" +
                 " values (?, ?, ?, ?);";
         jdbcTemplate.update(insertChatInSql, info.getLeader(), 0, false, key.get(0));
 
@@ -107,7 +113,7 @@ public class StudyRepository {
     }
 
     public String joinStudy(String nickname, StudyJoinDto joinInfo) {
-        String checkCodeSql = "select is_open, code from study_info where room_key = ?;";
+        String checkCodeSql = "select max_num, cur_num, is_open, code from study_info where room_key = ?;";
         List<RoomJoinInfo> v = jdbcTemplate.query(checkCodeSql, (rs, rowNum) -> {
             return new RoomJoinInfo(rs.getInt("max_num"), rs.getInt("cur_num"),
                     rs.getBoolean("is_open"), rs.getString("code"));
@@ -221,6 +227,37 @@ public class StudyRepository {
             return 0;
         else
             return msgNum.get(0);
+    }
+
+    public String changeInfo(int roomKey, StudyChangeDto info) {
+        String getInfoSql = "select cur_num from study_info where room_key = ?;";
+        List<Integer> curNum = jdbcTemplate.query(getInfoSql, (rs, rowNum) -> {
+            return Integer.valueOf(rs.getInt("cur_num"));
+        }, roomKey);
+        int curN = curNum.get(0);
+
+        if(curN > info.getMaxNum())
+            return "no";
+
+        String name = info.getRoomName();
+        String newSql = "update study_info set max_num = ?, room_name = ?, course_name = ?, " +
+                "is_open = ?, code = ?, study_introduction = ? where room_key = ?;";
+        jdbcTemplate.update(newSql, info.getMaxNum(), info.getRoomName(), info.getCourse(),
+                info.getIsOpen(), info.getCode(), info.getStudyIntroduction(), roomKey);
+        return "ok";
+    }
+
+    public void studyCommitLeader(int roomKey, String newLeader) {
+        String sql = "update study_info set leader = ? where room_key = ?;";
+        jdbcTemplate.update(sql, newLeader, roomKey);
+    }
+
+    public void outStudy(int roomKey, String nickname) {
+        String outSql1 = "update study_info set cur_num = cur_num - 1 where room_key = ?;";
+        String outSql2 = "delete from study_chat_in where nickname = ? and room_key = ?;";
+
+        jdbcTemplate.update(outSql1, roomKey);
+        jdbcTemplate.update(outSql2, nickname, roomKey);
     }
 }
 

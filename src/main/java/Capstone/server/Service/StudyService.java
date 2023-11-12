@@ -89,4 +89,16 @@ public class StudyService {
     public void outChat(int roomKey, String nickname) {
         studyRepository.setChatIsOn(roomKey, nickname, false);
     }
+
+    public String changeInfo(int roomKey, StudyChangeDto info) {
+        return studyRepository.changeInfo(roomKey, info);
+    }
+
+    public void studyCommitLeader(int roomKey, String newLeader) {
+        studyRepository.studyCommitLeader(roomKey, newLeader);
+    }
+
+    public void outStudy(int roomKey, String nickname) {
+        studyRepository.outStudy(roomKey, nickname);
+    }
 }

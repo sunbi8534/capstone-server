@@ -31,7 +31,7 @@ public class StudyController {
     }
 
     @ResponseBody
-    @PostMapping("/studyRoom/join/{nickname}")
+    @PostMapping("/study/join/{nickname}")
     public String joinStudy(@PathVariable String nickname, @RequestBody StudyJoinDto joinInfo) {
         return studyService.joinStudy(nickname, joinInfo);
     }
@@ -71,4 +71,23 @@ public class StudyController {
     public void outChat(@RequestParam int roomKey, @RequestParam String nickname) {
         studyService.outChat(roomKey, nickname);
     }
+
+    @ResponseBody
+    @PostMapping("/study/change/{roomKey}")
+    public String changeInfo(@PathVariable int roomKey, @RequestBody StudyChangeDto info) {
+        return studyService.changeInfo(roomKey, info);
+    }
+
+    @ResponseBody
+    @PostMapping("/study/commitLeader/{roomKey}")
+    public void studyCommitLeader(@PathVariable int roomKey, @RequestParam String newLeader) {
+        studyService.studyCommitLeader(roomKey, newLeader);
+    }
+
+    @ResponseBody
+    @PostMapping("/study/out/{nickname}")
+    public void outStudy(@PathVariable String nickname, @RequestParam int roomKey) {
+        studyService.outStudy(roomKey, nickname);
+    }
+
 }
