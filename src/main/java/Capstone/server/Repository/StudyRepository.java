@@ -253,6 +253,24 @@ public class StudyRepository {
     }
 
     public void outStudy(int roomKey, String nickname) {
+        String checkStudySql = "select cur_num from study_info where room_key = ?;";
+        List<Integer> num = jdbcTemplate.query(checkStudySql, (rs, rowNum) -> {
+            return Integer.valueOf(rs.getInt("cur_num"));
+        }, roomKey);
+
+        int curNum = num.get(0);
+        if(curNum == 1) {
+            String studyChat = "study_chat_" + String.valueOf(roomKey);
+            String dropSql = "drop table " + studyChat + ";";
+            String delChatInSql = "delete from study_chat_in where room_key = ?;";
+            String delStudyInfoSql = "delete from study_info where room_key = ?;";
+
+            jdbcTemplate.update(dropSql);
+            jdbcTemplate.update(delChatInSql, roomKey);
+            jdbcTemplate.update(delStudyInfoSql, roomKey);
+            return;
+        }
+
         String outSql1 = "update study_info set cur_num = cur_num - 1 where room_key = ?;";
         String outSql2 = "delete from study_chat_in where nickname = ? and room_key = ?;";
         //

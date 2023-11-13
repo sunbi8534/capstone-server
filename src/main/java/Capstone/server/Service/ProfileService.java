@@ -66,7 +66,11 @@ public class ProfileService {
     }
 
     public void setCourse(String nickname, List<String> course) {
-        profileRepository.setCourse(nickname, course);
+        profileRepository.setCourse(nickname, course, true);
+    }
+
+    public void setCourseAll(String nickname, CourseAllDto course) {
+        profileRepository.setCourseAll(nickname, course);
     }
 
     public void deleteCourse(String nickname, List<String> course) {

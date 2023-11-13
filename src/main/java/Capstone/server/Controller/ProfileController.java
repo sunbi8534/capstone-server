@@ -77,6 +77,13 @@ public class ProfileController {
     }
 
     @ResponseBody
+    @PostMapping("/user/profile/setCourseAll/{nickname}")
+    public String setCourseAll(@PathVariable String nickname, @RequestBody CourseAllDto course) {
+        profileService.setCourseAll(nickname, course);
+        return "ok";
+    }
+
+    @ResponseBody
     @PostMapping("/user/profile/removeCourse/{nickname}")
     public String deleteCourse(@PathVariable("nickname") String nickname,
                                @RequestBody CourseDto courseDto) {

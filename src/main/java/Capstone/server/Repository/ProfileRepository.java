@@ -1,9 +1,6 @@
 package Capstone.server.Repository;
 
-import Capstone.server.DTO.Profile.DepartmentDto;
-import Capstone.server.DTO.Profile.UserCourseInfo;
-import Capstone.server.DTO.Profile.UserProfileInfoDto;
-import Capstone.server.DTO.Profile.UserProfileInfoForShowDto;
+import Capstone.server.DTO.Profile.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
@@ -96,11 +93,16 @@ public class ProfileRepository {
         jdbcTemplate.update(setDepartmentSql, department.getDept_name1(), department.getDept_name2(), nickname);
     }
 
-    public void setCourse(String nickname, List<String> course) {
+    public void setCourse(String nickname, List<String> course, boolean isNow) {
         String setCourseSql = "insert into take (nickname, course_name, is_now, is_past, is_pick) values (?, ?, ?, ?, ?);";
         for(String c : course) {
-            jdbcTemplate.update(setCourseSql, nickname, c, true, false, false);
+            jdbcTemplate.update(setCourseSql, nickname, c, isNow, !isNow, false);
         }
+    }
+
+    public void setCourseAll(String nickname, CourseAllDto course) {
+        setCourse(nickname, course.getCurrentCourses(), true);
+        setCourse(nickname, course.getPastCourses(), false);
     }
 
     public void deleteCourse(String nickname, List<String> course) {
