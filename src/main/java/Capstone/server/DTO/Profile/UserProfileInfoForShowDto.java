@@ -22,6 +22,7 @@ public class UserProfileInfoForShowDto {
     int question;
     int answer;
     int studyCnt;
+    double review;
 
     public void setUserInfo(ProfileRepository.UserProfileInfo userProfileInfo) {
         this.setIntroduction(userProfileInfo.getIntroduction());

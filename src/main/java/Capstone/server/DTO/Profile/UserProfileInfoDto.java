@@ -20,6 +20,7 @@ public class UserProfileInfoDto {
     int question;
     int answer;
     int studyCnt;
+    double review;
 
     public void setDepartments(DepartmentDto departments) {
         this.departments = new ArrayList<>();

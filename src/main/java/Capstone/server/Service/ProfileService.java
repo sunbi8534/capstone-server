@@ -2,6 +2,7 @@ package Capstone.server.Service;
 
 import Capstone.server.DTO.Profile.*;
 import Capstone.server.Repository.ProfileRepository;
+import Capstone.server.Repository.QaRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import java.util.ArrayList;
@@ -10,8 +11,11 @@ import java.util.List;
 @Service
 public class ProfileService {
     ProfileRepository profileRepository;
-    public ProfileService(ProfileRepository profileRepository) {
+    QaService qaService;
+    public ProfileService(ProfileRepository profileRepository,
+                          QaService qaService) {
         this.profileRepository = profileRepository;
+        this.qaService = qaService;
     }
     public UserProfileInfoDto getProfileInfo(String nickname) {
         UserProfileInfoDto userInfo = new UserProfileInfoDto();
@@ -21,7 +25,7 @@ public class ProfileService {
         userInfo.setUserCourseInfo(profileRepository.getUserCourseInfo(nickname));
         userInfo.setQuestion(profileRepository.getUserAskCount(nickname));
         userInfo.setAnswer(profileRepository.getUserAnswerCount(nickname));
-
+        userInfo.setReview(qaService.getUserReview(nickname));
         return userInfo;
     }
 
@@ -33,6 +37,7 @@ public class ProfileService {
         friendInfo.setProfileImage(profileRepository.getProfileImage(friendNickname));
         friendInfo.setQuestion(profileRepository.getUserAskCount(friendNickname));
         friendInfo.setAnswer(profileRepository.getUserAnswerCount(friendNickname));
+        friendInfo.setReview(qaService.getUserReview(friendNickname));
         profileRepository.getRelationship(nickname, friendInfo);
 
         return friendInfo;

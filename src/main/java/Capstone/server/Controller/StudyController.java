@@ -1,13 +1,12 @@
 package Capstone.server.Controller;
 
-import Capstone.server.DTO.Chat.ChatMemberDto;
 import Capstone.server.DTO.Chat.MsgDto;
-import Capstone.server.DTO.Chat.SendMsgDto;
 import Capstone.server.DTO.Profile.UserInfoMinimumDto;
 import Capstone.server.DTO.Study.*;
 import Capstone.server.Service.StudyService;
 import org.springframework.web.bind.annotation.*;
 
+import javax.mail.Multipart;
 import java.util.List;
 
 @RestController
@@ -90,4 +89,15 @@ public class StudyController {
         studyService.outStudy(roomKey, nickname);
     }
 
+    @ResponseBody
+    @PostMapping("/study/enroll/File/{roomKey}")
+    public void enrollFile(@PathVariable int roomKey, Multipart file) {
+
+    }
+
+    @ResponseBody
+    @GetMapping("/study/getQuiz/{roomKey}")
+    public void getQuiz(@PathVariable int roomKey) {
+
+    }
 }
