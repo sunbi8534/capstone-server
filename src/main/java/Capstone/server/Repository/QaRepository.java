@@ -336,16 +336,4 @@ public class QaRepository {
 
         return msgs;
     }
-
-    public List<Integer> getUserReview(String nickname) {
-        String getReviewSql = "select review from qa where solver = ? and status = true;";
-        List<Integer> reviewValues = jdbcTemplate.query(getReviewSql, (rs, rowNum) -> {
-            return Integer.valueOf(rs.getInt("review"));
-        }, nickname);
-
-        if (reviewValues.isEmpty())
-            return null;
-        else
-            return reviewValues;
-    }
 }

@@ -85,9 +85,4 @@ public class QaController {
         return qaService.getQa(qaKey);
     }
 
-    @ResponseBody
-    @GetMapping("user/qa/review")
-    public double getUserReview(@RequestParam String nickname) {
-        return qaService.getUserReview(nickname);
-    }
 }

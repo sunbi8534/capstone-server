@@ -11,11 +11,9 @@ import java.util.List;
 @Service
 public class ProfileService {
     ProfileRepository profileRepository;
-    QaService qaService;
-    public ProfileService(ProfileRepository profileRepository,
-                          QaService qaService) {
+
+    public ProfileService(ProfileRepository profileRepository) {
         this.profileRepository = profileRepository;
-        this.qaService = qaService;
     }
     public UserProfileInfoDto getProfileInfo(String nickname) {
         UserProfileInfoDto userInfo = new UserProfileInfoDto();
@@ -25,7 +23,7 @@ public class ProfileService {
         userInfo.setUserCourseInfo(profileRepository.getUserCourseInfo(nickname));
         userInfo.setQuestion(profileRepository.getUserAskCount(nickname));
         userInfo.setAnswer(profileRepository.getUserAnswerCount(nickname));
-        userInfo.setReview(qaService.getUserReview(nickname));
+        userInfo.setReview(getUserReview(nickname));
         return userInfo;
     }
 
@@ -37,7 +35,7 @@ public class ProfileService {
         friendInfo.setProfileImage(profileRepository.getProfileImage(friendNickname));
         friendInfo.setQuestion(profileRepository.getUserAskCount(friendNickname));
         friendInfo.setAnswer(profileRepository.getUserAnswerCount(friendNickname));
-        friendInfo.setReview(qaService.getUserReview(friendNickname));
+        friendInfo.setReview(getUserReview(friendNickname));
         profileRepository.getRelationship(nickname, friendInfo);
 
         return friendInfo;
@@ -148,5 +146,18 @@ public class ProfileService {
         course.addAll(userCourse.getPastCourses());
         course.addAll(userCourse.getCurrentCourses());
         return course;
+    }
+
+    public double getUserReview(String nickname) {
+        List<Integer> reviewValue = profileRepository.getUserReview(nickname);
+        int sum = 0;
+        if (reviewValue == null)
+            return 0;
+        else {
+            for(int v : reviewValue)
+                sum += v;
+
+            return (double) sum / reviewValue.size();
+        }
     }
 }

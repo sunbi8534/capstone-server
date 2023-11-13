@@ -66,16 +66,4 @@ public class QaService {
         return qaRepository.getQa(qaKey);
     }
 
-    public double getUserReview(String nickname) {
-        List<Integer> reviewValue = qaRepository.getUserReview(nickname);
-        int sum = 0;
-        if (reviewValue == null)
-            return 0;
-        else {
-            for(int v : reviewValue)
-                sum += v;
-
-            return (double) sum / reviewValue.size();
-        }
-    }
 }
