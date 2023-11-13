@@ -31,7 +31,9 @@ public class UserProfileInfoForShowDto {
     }
     public void setDepartments(DepartmentDto departments) {
         this.departments = new ArrayList<>();
-        this.departments.add(departments.getDept_name1());
-        this.departments.add(departments.getDept_name2());
+        if(departments.getDept_name1() != null)
+            this.departments.add(departments.getDept_name1());
+        if(departments.getDept_name2() != null)
+            this.departments.add(departments.getDept_name2());
     }
 }
