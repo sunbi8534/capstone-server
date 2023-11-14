@@ -81,11 +81,7 @@ public class ChatRepository {
     public boolean checkIsExistChat(String nickname1, String nickname2) {
         String checkSql = "select chat_table_key from chat_in where nickname = ? and friend_nickname = ?;";
         List<Integer> key = jdbcTemplate.query(checkSql, (rs, rowNum) -> {
-            Integer v = rs.getInt("chat_table_key");
-            if(v == null)
-                return null;
-            else
-                return v;
+            return Integer.valueOf(rs.getInt("chat_table_key"));
         }, nickname1, nickname2);
 
         if(key.isEmpty())

@@ -49,7 +49,7 @@ public class ChatService {
     public List<MsgDto> getUnreadMsg(String nickname1, String nickname2) {
         List<MsgDto> unreadMsg = new ArrayList<>();
         List<Msg> msgs = chatRepository.getUnreadMsg(nickname1, nickname2);
-        if(msgs == null)
+        if(msgs.isEmpty())
             return unreadMsg;
 
         for(Msg msg : msgs) {

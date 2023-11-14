@@ -72,7 +72,7 @@ public class StudyService {
     public List<MsgDto> getUnreadMsg(int roomKey, String nickname) {
         List<MsgDto> unreadMsg = new ArrayList<>();
         List<Msg> msgs = studyRepository.getUnreadMsg(roomKey, nickname);
-        if(msgs == null)
+        if(msgs.isEmpty())
             return unreadMsg;
 
         for(Msg msg : msgs) {
