@@ -153,4 +153,10 @@ public class ProfileController {
     public List<String> getUserCourse(@RequestParam String nickname) {
         return profileService.getUserCourse(nickname);
     }
+
+    @ResponseBody
+    @GetMapping("/user/profile/image")
+    public String getProfileImage(@RequestParam String nickname) {
+        return profileService.getProfileImage(nickname);
+    }
 }

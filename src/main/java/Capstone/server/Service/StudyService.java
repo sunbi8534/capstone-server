@@ -52,7 +52,7 @@ public class StudyService {
             return msgDtos;
 
         for(Msg msg : msgs) {
-            MsgDto msgDto = new MsgDto(msg.getNickname(), profileService.getProfileImage(msg.getNickname()), msg.getType(), msg.getMsg(), msg.getImage(), msg.getTime());
+            MsgDto msgDto = new MsgDto(msg.getNickname(), msg.getType(), msg.getMsg(), msg.getImage(), msg.getTime());
             msgDtos.add(msgDto);
         }
 
@@ -76,7 +76,7 @@ public class StudyService {
             return unreadMsg;
 
         for(Msg msg : msgs) {
-            MsgDto msgDto = new MsgDto(msg.getNickname(), profileService.getProfileImage(msg.getNickname()), msg.getType(), msg.getMsg(), msg.getImage(), msg.getTime());
+            MsgDto msgDto = new MsgDto(msg.getNickname(), msg.getType(), msg.getMsg(), msg.getImage(), msg.getTime());
             unreadMsg.add(msgDto);
         }
 

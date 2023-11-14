@@ -225,9 +225,6 @@ public class QaRepository {
         String setMsgNumSql = "update qa_chat_in set solver_msg_num = ?, solver_is_on = true where qa_key = ?;";
         jdbcTemplate.update(setMsgNumSql, maker.getMsgNum(), qaKey);
 
-        String myProfileImg = profileRepository.getProfileImage(nickname);
-        String questionerImg = profileRepository.getProfileImage(maker.getNickname());
-
         String chatRoomName = "qa_chat_" + String.valueOf(qaKey);
         String getMsgSql = "select nickname, type, msg, image, time from " + chatRoomName + " order by msg_num ASC;";
         List<QaMsgDto> msgs = jdbcTemplate.query(getMsgSql, (rs, rowNum) -> {
@@ -236,11 +233,6 @@ public class QaRepository {
         });
 
         for(QaMsgDto q : msgs) {
-            if(q.getNickname().equals(nickname))
-                q.setProfileImg(myProfileImg);
-            else
-                q.setProfileImg(questionerImg);
-
             if(anony)
                 q.setIsAnonymity(true);
         }
@@ -303,8 +295,6 @@ public class QaRepository {
         else
             mNum = userInfo.getSolverMsgNum();
 
-        String askerImg = profileRepository.getProfileImage(userInfo.getNickname());
-        String solverImg = profileRepository.getProfileImage(userInfo.getSolverNickname());
         Boolean anony = isAnonymity(qaKey);
 
         String getMsgSql = "select nickname, type, msg, image, time from " + chatRoomName + " where msg_num > ? order by msg_num ASC;";
@@ -317,11 +307,6 @@ public class QaRepository {
             return msgs;
 
         for(QaMsgDto q : msgs) {
-            if(q.getNickname().equals(userInfo.getNickname()))
-                q.setProfileImg(askerImg);
-            else
-                q.setProfileImg(solverImg);
-
             if(anony)
                 q.setIsAnonymity(true);
         }

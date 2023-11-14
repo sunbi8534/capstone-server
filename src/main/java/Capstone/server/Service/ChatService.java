@@ -20,8 +20,6 @@ public class ChatService {
 
     public List<MsgDto> getAllMsg(String nickname1, String nickname2) {
         List<MsgDto> msgDtos = new ArrayList<>();
-        String userProfileImg = profileService.getProfileImage(nickname1);
-        String friendProfileImg = profileService.getProfileImage(nickname2);
 
         if(!chatRepository.checkIsExistChat(nickname1, nickname2))
             chatRepository.makeNewChat(nickname1, nickname2);
@@ -31,12 +29,7 @@ public class ChatService {
             return msgDtos;
 
         for(Msg msg : msgs) {
-            String profileImg;
-            if(msg.getNickname().equals(nickname1))
-                profileImg = userProfileImg;
-            else
-                profileImg = friendProfileImg;
-            MsgDto msgDto = new MsgDto(msg.getNickname(), profileImg, msg.getType(), msg.getMsg(), msg.getImage(), msg.getTime());
+            MsgDto msgDto = new MsgDto(msg.getNickname(), msg.getType(), msg.getMsg(), msg.getImage(), msg.getTime());
             msgDtos.add(msgDto);
         }
 
@@ -55,19 +48,12 @@ public class ChatService {
 
     public List<MsgDto> getUnreadMsg(String nickname1, String nickname2) {
         List<MsgDto> unreadMsg = new ArrayList<>();
-        String userProfileImg = profileService.getProfileImage(nickname1);
-        String friendProfileImg = profileService.getProfileImage(nickname2);
         List<Msg> msgs = chatRepository.getUnreadMsg(nickname1, nickname2);
         if(msgs == null)
             return unreadMsg;
 
         for(Msg msg : msgs) {
-            String profileImg;
-            if(msg.getNickname().equals(nickname1))
-                profileImg = userProfileImg;
-            else
-                profileImg = friendProfileImg;
-            MsgDto msgDto = new MsgDto(msg.getNickname(), profileImg, msg.getType(), msg.getMsg(), msg.getImage(), msg.getTime());
+            MsgDto msgDto = new MsgDto(msg.getNickname(), msg.getType(), msg.getMsg(), msg.getImage(), msg.getTime());
             unreadMsg.add(msgDto);
         }
 
