@@ -245,6 +245,11 @@ public class ProfileRepository {
             return reviewValues;
     }
 
+    public void setPoint(String nickname, int point) {
+        String setPointSql = "update user set point = ? where nickname = ?;";
+        jdbcTemplate.update(setPointSql, point, nickname);
+    }
+
     @AllArgsConstructor
     @Getter
     class Relationship {

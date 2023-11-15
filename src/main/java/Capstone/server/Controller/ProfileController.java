@@ -159,4 +159,10 @@ public class ProfileController {
     public String getProfileImage(@RequestParam String nickname) {
         return profileService.getProfileImage(nickname);
     }
+
+    @ResponseBody
+    @PostMapping("/user/profile/point")
+    public void setPoint(@RequestParam String nickname, @RequestParam int point) {
+        profileService.setPoint(nickname, point);
+    }
 }

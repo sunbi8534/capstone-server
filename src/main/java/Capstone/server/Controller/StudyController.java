@@ -5,8 +5,7 @@ import Capstone.server.DTO.Profile.UserInfoMinimumDto;
 import Capstone.server.DTO.Study.*;
 import Capstone.server.Service.StudyService;
 import org.springframework.web.bind.annotation.*;
-
-import javax.mail.Multipart;
+import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 
 @RestController
@@ -90,8 +89,9 @@ public class StudyController {
     }
 
     @ResponseBody
-    @PostMapping("/study/enroll/File/{roomKey}")
-    public void enrollFile(@PathVariable int roomKey, Multipart file) {
+    @PostMapping("/study/enroll/File/{roomKey}/{nickname}")
+    public void enrollFile(@PathVariable int roomKey, @PathVariable String nickname,
+                           @RequestParam MultipartFile file) {
 
     }
 

@@ -41,8 +41,14 @@ public class ChatController {
     }
 
     @ResponseBody
-    @GetMapping("chat/list")
+    @GetMapping("/chat/list")
     public List<ChatListDto> getChatList(@RequestParam String nickname) {
         return chatService.getChatList(nickname);
+    }
+
+    @ResponseBody
+    @PostMapping("/chat/delete")
+    public void deleteChat(@RequestParam String nickname1, @RequestParam String nickname2) {
+        chatService.deleteChat(nickname1, nickname2);
     }
 }

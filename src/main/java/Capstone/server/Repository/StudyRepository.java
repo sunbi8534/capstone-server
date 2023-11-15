@@ -1,7 +1,6 @@
 package Capstone.server.Repository;
 
 import Capstone.server.DTO.Chat.Msg;
-import Capstone.server.DTO.Chat.SendMsgDto;
 import Capstone.server.DTO.Profile.UserInfoMinimumDto;
 import Capstone.server.DTO.Study.*;
 import Capstone.server.Service.ProfileService;
@@ -276,6 +275,10 @@ public class StudyRepository {
         //
         jdbcTemplate.update(outSql1, roomKey);
         jdbcTemplate.update(outSql2, nickname, roomKey);
+    }
+
+    public void enrollFileContent(int roomKey, String nickname, String content) {
+        String insertSql = "";
     }
 }
 

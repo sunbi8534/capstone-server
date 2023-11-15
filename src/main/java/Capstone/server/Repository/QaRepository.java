@@ -5,6 +5,7 @@ import Capstone.server.DTO.Qa.*;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,8 +31,8 @@ public class QaRepository {
         } else
             myKey = key.get(key.size() - 1) + 1;
         String insertQaSql = "insert into qa (my_key, qa_type, course_name, qa_num, point, questioner, solver," +
-                " is_anonymity, is_watching, is_solving, status, review) values (?, ?, ?, ?, ?, ?, null, ?, false," +
-                " false, false, 0);";
+                " is_anonymity, is_watching, is_solving, status, review, time) values (?, ?, ?, ?, ?, ?, null, ?, false," +
+                " false, false, 0, 0);";
         jdbcTemplate.update(insertQaSql, myKey, q.getType(), q.getCourse(), q.getMsg().size(), q.getPoint(), q.getNickname(),
                 q.getIsAnonymity());
         String getQaKeySql = "select qa_key from qa where my_key = ? and questioner = ?;";
@@ -241,7 +242,7 @@ public class QaRepository {
     }
 
     public void qaGiveUp(int qaKey, String nickname) {
-        String setGiveUpSql1 = "update qa set is_watching = false and solver = null where qa_key = ?;";
+        String setGiveUpSql1 = "update qa set is_watching = false, solver = null where qa_key = ?;";
         String setGiveUpSql2 = "update qa_chat_in set solver_nickname = null, solver_msg_num = 0," +
                 " solver_is_on = false where qa_key = ?;";
         String getMsgNumSql = "select qa_num from qa where qa_key = ?;";
@@ -264,8 +265,9 @@ public class QaRepository {
     }
 
     public void qaSolve(int qaKey) {
-        String solveQaSql = "update qa set is_solving = true where qa_key = ?;";
-        jdbcTemplate.update(solveQaSql, qaKey);
+        long epochTime = Instant.now().getEpochSecond();
+        String solveQaSql = "update qa set is_solving = true, time = ? where qa_key = ?;";
+        jdbcTemplate.update(solveQaSql, epochTime, qaKey);
     }
 
     public void sendQaMsg(int qaKey, QaSendMsgDto msg) {
@@ -320,5 +322,14 @@ public class QaRepository {
             jdbcTemplate.update(setSolverSql, lastNum, qaKey);
 
         return msgs;
+    }
+
+    public long getTime(int qaKey) {
+        String getSql = "select time from qa where qa_key = ?;";
+        List<Long> time = jdbcTemplate.query(getSql, (rs, rowNum) -> {
+            return Long.valueOf(rs.getLong("time"));
+        }, qaKey);
+
+        return time.get(0);
     }
 }

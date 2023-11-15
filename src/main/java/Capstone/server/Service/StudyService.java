@@ -7,9 +7,15 @@ import Capstone.server.DTO.Chat.SendMsgDto;
 import Capstone.server.DTO.Profile.UserInfoMinimumDto;
 import Capstone.server.DTO.Study.*;
 import Capstone.server.Repository.StudyRepository;
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.text.PDFTextStripper;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
 
+import javax.mail.Multipart;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -100,5 +106,24 @@ public class StudyService {
 
     public void outStudy(int roomKey, String nickname) {
         studyRepository.outStudy(roomKey, nickname);
+    }
+
+    public String enrollFile(int roomKey, String nickname, MultipartFile file) {
+        try {
+            if(!file.getContentType().equalsIgnoreCase("application/pdf")) {
+                return "it is not pdf File.";
+            }
+            InputStream inputStream = file.getInputStream();
+            PDDocument document = PDDocument.load(inputStream);
+            PDFTextStripper stripper = new PDFTextStripper();
+            String content = stripper.getText(document);
+
+
+            document.close();
+        }catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return "hello";
     }
 }

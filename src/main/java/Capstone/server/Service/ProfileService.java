@@ -160,4 +160,8 @@ public class ProfileService {
             return (double) sum / reviewValue.size();
         }
     }
+
+    public void setPoint(String nickname, int point) {
+        profileRepository.setPoint(nickname, point);
+    }
 }

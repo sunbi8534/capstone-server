@@ -174,4 +174,18 @@ public class ChatRepository {
 
         return chatList;
     }
+
+    public void deleteChat(String nickname1, String nickname2) {
+        String getKeySql = "select chat_table_key from chat_in where nickname = ? and friend_nickname = ?;";
+
+        List<Integer> key = jdbcTemplate.query(getKeySql, (rs, rowNum) -> {
+            return Integer.valueOf(rs.getInt("chat_table_key"));
+        }, nickname1, nickname2);
+
+        String chatRoomName = "chat_" + String.valueOf(key.get(0));
+        String delChatInSql = "delete from chat_in where chat_table_key = ?;";
+        String dropTableSql = "drop table " + chatRoomName + ";";
+        jdbcTemplate.update(delChatInSql, key.get(0));
+        jdbcTemplate.update(dropTableSql);
+    }
 }

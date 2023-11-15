@@ -70,4 +70,8 @@ public class ChatService {
     public List<ChatListDto> getChatList(String nickname) {
         return chatRepository.getChatList(nickname);
     }
+
+    public void deleteChat(String nickname1, String nickname2) {
+        chatRepository.deleteChat(nickname1, nickname2);
+    }
 }

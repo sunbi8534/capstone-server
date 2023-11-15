@@ -66,4 +66,6 @@ public class QaService {
         return qaRepository.getQa(qaKey);
     }
 
+    public long getTime(int qaKey) { return qaRepository.getTime(qaKey); }
+
 }
