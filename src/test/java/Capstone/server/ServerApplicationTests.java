@@ -1,5 +1,6 @@
 package Capstone.server;
 
+import io.github.flashvayne.chatgpt.service.ChatgptService;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
@@ -8,6 +9,7 @@ class ServerApplicationTests {
 
 	@Test
 	void contextLoads() {
+
 	}
 
 }

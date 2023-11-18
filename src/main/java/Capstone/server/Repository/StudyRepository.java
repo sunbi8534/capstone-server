@@ -89,6 +89,7 @@ public class StudyRepository {
         jdbcTemplate.update(insertChatInSql, info.getLeader(), 0, false, key.get(0));
 
         makeStudyChatTable(key.get(0));
+        makeStudyQuizTable(key.get(0));
         return "ok";
     }
 
@@ -98,6 +99,13 @@ public class StudyRepository {
                 "nickname varchar(60), type varchar(50), msg varchar(200), image MEDIUMTEXT, time varchar(50)," +
                 " primary key(msg_num));";
         jdbcTemplate.update(makeTableSql);
+    }
+
+    public void makeStudyQuizTable(int roomKey) {
+        String studyQuizTableName = "study_quiz_" + String.valueOf(roomKey);
+        String makeQuizTableSql = "create table " + studyQuizTableName + "(" +
+                "folder_key integer, nickname varchar(60), contents LONGTEXT);";
+        jdbcTemplate.update(makeQuizTableSql);
     }
     public boolean checkDupRoomName(String roomName) {
         String findDupSql = "select room_name from study_info where room_name = ?;";
@@ -126,8 +134,10 @@ public class StudyRepository {
                 return "codeError";
         }
 
+        String insSql = "update set cur_num = cur_num + 1 where room_key = ?;";
         String insertChatInSql = "insert into study_chat_in (nickname, msg_num, is_on, room_key) values" +
                 " (?, ?, ?, ?);";
+        jdbcTemplate.update(insSql, joinInfo.getRoomKey());
         jdbcTemplate.update(insertChatInSql, nickname, 0, false, joinInfo.getRoomKey());
         return "ok";
     }
@@ -277,8 +287,42 @@ public class StudyRepository {
         jdbcTemplate.update(outSql2, nickname, roomKey);
     }
 
-    public void enrollFileContent(int roomKey, String nickname, String content) {
-        String insertSql = "";
+    public boolean checkFileEnrollCan(int roomKey, int folderKey, String nickname) {
+        String quizTableName = "study_quiz_" + String.valueOf(roomKey);
+        String getSql = "select nickname from " + quizTableName + " where folder_key = ? and nickname = ?;";
+        List<String> nick = jdbcTemplate.query(getSql, (rs, rowNum) -> {
+            return String.valueOf(rs.getString("nickname"));
+        }, folderKey, nickname);
+
+        if(nick.isEmpty())
+            return true;
+        else
+            return false;
+    }
+
+    public void enrollFileContent(int roomKey, int folderKey, String nickname, String content) {
+        String quizTableName = "study_quiz_" + String.valueOf(roomKey);
+        String insertSql = "insert into " + quizTableName + " (folder_key, nickname, contents) values (?, ?, ?);";
+        jdbcTemplate.update(insertSql, folderKey, nickname, content);
+    }
+
+    public List<StudyQuizListDto> getQuizList(int roomKey) {
+        String getSql = "select folder_key, folder_name from study_quiz_info where room_key = ?;";
+        List<StudyQuizListDto> list = jdbcTemplate.query(getSql, (rs, rowNum) -> {
+            return new StudyQuizListDto(rs.getInt("folder_key"), rs.getString("folder_name"));
+        }, roomKey);
+
+        return list;
+    }
+
+    public List<String> getQuizContents(StudyQuizInfoDto info) {
+        String studyQuizTableName = "study_quiz_" + String.valueOf(info.getRoomKey());
+        String getContentsSql = "select contents from " + studyQuizTableName + " where folder_key = ?;";
+        List<String> contents = jdbcTemplate.query(getContentsSql, (rs, rowNum) -> {
+            return String.valueOf(rs.getString("contents"));
+        }, info.getFolderKey());
+
+        return contents;
     }
 }
 

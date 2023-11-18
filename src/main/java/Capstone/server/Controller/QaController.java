@@ -15,8 +15,8 @@ public class QaController {
     }
     @ResponseBody
     @PostMapping("/qa")  //D
-    public void enrollQuestion(@RequestBody QaDto question) {
-        qaService.enrollQa(question);
+    public int enrollQuestion(@RequestBody QaDto question) {
+        return qaService.enrollQa(question);
     }
 
     @ResponseBody

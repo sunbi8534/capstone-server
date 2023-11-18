@@ -2,6 +2,7 @@ package Capstone.server.Controller;
 
 import Capstone.server.DTO.Chat.MsgDto;
 import Capstone.server.DTO.Profile.UserInfoMinimumDto;
+import Capstone.server.DTO.Quiz.QuizDto;
 import Capstone.server.DTO.Study.*;
 import Capstone.server.Service.StudyService;
 import org.springframework.web.bind.annotation.*;
@@ -89,15 +90,21 @@ public class StudyController {
     }
 
     @ResponseBody
-    @PostMapping("/study/enroll/File/{roomKey}/{nickname}")
-    public void enrollFile(@PathVariable int roomKey, @PathVariable String nickname,
+    @PostMapping("/study/enroll/File/{roomKey}/{folderKey}/{nickname}")
+    public String enrollFile(@PathVariable int roomKey, @PathVariable int folderKey, @PathVariable String nickname,
                            @RequestParam MultipartFile file) {
-
+        return studyService.enrollFile(roomKey, folderKey, nickname, file);
     }
 
     @ResponseBody
-    @GetMapping("/study/getQuiz/{roomKey}")
-    public void getQuiz(@PathVariable int roomKey) {
+    @GetMapping("/study/quiz")
+    public List<QuizDto> getQuiz(@RequestBody StudyQuizInfoDto info) {
+        return studyService.getQuiz(info);
+    }
 
+    @ResponseBody
+    @GetMapping("/study/quiz/list")
+    public List<StudyQuizListDto> getQuizList(@RequestParam int roomKey) {
+        return studyService.getQuizList(roomKey);
     }
 }

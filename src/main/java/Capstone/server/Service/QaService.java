@@ -18,8 +18,8 @@ public class QaService {
         this.profileService = profileService;
     }
 
-    public void enrollQa(QaDto qaDto) {
-        qaRepository.enrollQa(qaDto);
+    public int enrollQa(QaDto qaDto) {
+        return qaRepository.enrollQa(qaDto);
     }
 
     public String deleteQa(int qaKey) {

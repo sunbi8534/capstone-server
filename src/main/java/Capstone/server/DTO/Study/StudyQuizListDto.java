@@ -1,16 +1,15 @@
-package Capstone.server.DTO.Quiz;
+package Capstone.server.DTO.Study;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+@Getter
 @AllArgsConstructor
 @NoArgsConstructor
-@Getter
 @Setter
-public class QuizDto {
-    int quizNum;
-    String question;
-    String answer;
+public class StudyQuizListDto {
+    int folderKey;
+    String folderName;
 }

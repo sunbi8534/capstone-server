@@ -1,4 +1,4 @@
-package Capstone.server.DTO.Quiz;
+package Capstone.server.DTO.ChatGpt;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -6,11 +6,10 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @AllArgsConstructor
-@NoArgsConstructor
 @Getter
 @Setter
-public class QuizDto {
-    int quizNum;
-    String question;
-    String answer;
+@NoArgsConstructor
+public class Message {
+    private String role;
+    private String content;
 }

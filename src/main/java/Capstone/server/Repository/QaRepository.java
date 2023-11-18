@@ -3,6 +3,8 @@ package Capstone.server.Repository;
 import Capstone.server.DTO.Chat.MsgDto;
 import Capstone.server.DTO.Qa.*;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
 
 import java.time.Instant;
@@ -12,6 +14,8 @@ import java.util.List;
 @Repository
 public class QaRepository {
     JdbcTemplate jdbcTemplate;
+    SimpleJdbcInsert simpleJdbcInsert; //study
+    NamedParameterJdbcTemplate namedParameterJdbcTemplate; //study
     ProfileRepository profileRepository;
 
     QaRepository(JdbcTemplate jdbcTemplate,
@@ -19,7 +23,7 @@ public class QaRepository {
         this.jdbcTemplate = jdbcTemplate;
         this.profileRepository = profileRepository;
     }
-    public void enrollQa(QaDto q) {
+    public int enrollQa(QaDto q) {
         int myKey;
         String getMynumSql = "select my_key from handle_ask where nickname = ? order by my_key ASC;";
         List<Integer> key = jdbcTemplate.query(getMynumSql, (rs, rowNum) -> {
@@ -57,6 +61,7 @@ public class QaRepository {
 
         String insertHandleAskSql = "insert into handle_ask (nickname, qa_key, my_key) values (?, ?, ?);";
         jdbcTemplate.update(insertHandleAskSql, q.getNickname(), qaKey.get(0), myKey);
+        return qaKey.get(0);
     }
 
     public List<QaMsgDto> getQa(int qaKey) {
@@ -212,8 +217,6 @@ public class QaRepository {
         jdbcTemplate.update(setQaSql, nickname, qaKey);
         String setQaChatSql = "update qa_chat_in set solver_nickname = ? where qa_key = ?;";
         jdbcTemplate.update(setQaChatSql, nickname, qaKey);
-        String setHandleSql = "insert into handle_answer (nickname, qa_key) values (?, ?);";
-        jdbcTemplate.update(setHandleSql, nickname, qaKey);
 
         String getQaMsgSql = "select msg_num, nickname from qa_chat_in where qa_key = ?;";
         List<QaMaker> qaMakers = jdbcTemplate.query(getQaMsgSql, (rs, rowNum) -> {
@@ -267,7 +270,16 @@ public class QaRepository {
     public void qaSolve(int qaKey) {
         long epochTime = Instant.now().getEpochSecond();
         String solveQaSql = "update qa set is_solving = true, time = ? where qa_key = ?;";
+        String getSql = "select solver from qa where qa_key = ?;";
+        List<String> solver = jdbcTemplate.query(getSql, (rs, rowNum) -> {
+            return String.valueOf(rs.getString("solver"));
+        }, qaKey);
+        String nickname = solver.get(0);
+        String updateSql = "insert into handle_answer (nickname, qa_key) values (?, ?);";
+
+
         jdbcTemplate.update(solveQaSql, epochTime, qaKey);
+        jdbcTemplate.update(updateSql, nickname, qaKey);
     }
 
     public void sendQaMsg(int qaKey, QaSendMsgDto msg) {

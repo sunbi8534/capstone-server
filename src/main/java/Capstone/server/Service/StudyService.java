@@ -5,8 +5,12 @@ import Capstone.server.DTO.Chat.Msg;
 import Capstone.server.DTO.Chat.MsgDto;
 import Capstone.server.DTO.Chat.SendMsgDto;
 import Capstone.server.DTO.Profile.UserInfoMinimumDto;
+import Capstone.server.DTO.Quiz.QuizDto;
 import Capstone.server.DTO.Study.*;
 import Capstone.server.Repository.StudyRepository;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.text.PDFTextStripper;
 import org.springframework.stereotype.Service;
@@ -23,11 +27,14 @@ import java.util.List;
 public class StudyService {
     StudyRepository studyRepository;
     ProfileService profileService;
+    ChatGptService chatGptService;
 
     public StudyService(StudyRepository studyRepository,
-                        ProfileService profileService) {
+                        ProfileService profileService,
+                        ChatGptService chatGptService) {
         this.studyRepository = studyRepository;
         this.profileService = profileService;
+        this.chatGptService = chatGptService;
     }
 
     public List<StudyInfoDto> getStudyRoomList(String nickname, RoomStatusDto roomStatus) {
@@ -108,10 +115,13 @@ public class StudyService {
         studyRepository.outStudy(roomKey, nickname);
     }
 
-    public String enrollFile(int roomKey, String nickname, MultipartFile file) {
+    public String enrollFile(int roomKey, int folderKey, String nickname, MultipartFile file) {
         try {
+            if(!studyRepository.checkFileEnrollCan(roomKey, folderKey, nickname))
+                return "already enroll";
+
             if(!file.getContentType().equalsIgnoreCase("application/pdf")) {
-                return "it is not pdf File.";
+                return "it is not pdf File";
             }
             InputStream inputStream = file.getInputStream();
             PDDocument document = PDDocument.load(inputStream);
@@ -119,11 +129,40 @@ public class StudyService {
             String content = stripper.getText(document);
 
 
+            studyRepository.enrollFileContent(roomKey, folderKey, nickname, content);
             document.close();
         }catch (IOException e) {
             e.printStackTrace();
         }
 
         return "hello";
+    }
+
+    public List<QuizDto> getQuiz(StudyQuizInfoDto info) {
+        List<QuizDto> quiz = new ArrayList<>();
+        List<String> contents = studyRepository.getQuizContents(info);
+        StringBuilder allContents = new StringBuilder();
+        if(contents.isEmpty()) {
+            System.out.println("empty");
+        }
+
+        for(String c : contents) {
+            allContents.append(c);
+        }
+
+        String result = chatGptService.getQuiz(allContents, info.isType());
+        result = "[" + result + "]";
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+            quiz = objectMapper.readValue(result, objectMapper.getTypeFactory().constructCollectionType(List.class, QuizDto.class));
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+        System.out.println(result);
+        return quiz;
+    }
+
+    public List<StudyQuizListDto> getQuizList(int roomKey) {
+        return studyRepository.getQuizList(roomKey);
     }
 }

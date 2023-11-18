@@ -1,4 +1,4 @@
-package Capstone.server.DTO.Quiz;
+package Capstone.server.DTO.Study;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -9,8 +9,9 @@ import lombok.Setter;
 @NoArgsConstructor
 @Getter
 @Setter
-public class QuizDto {
+public class StudyQuizInfoDto {
+    int roomKey;
+    int folderKey;
+    boolean type; //true면 다지선다, false면 개념
     int quizNum;
-    String question;
-    String answer;
 }
