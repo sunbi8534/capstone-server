@@ -165,4 +165,10 @@ public class ProfileController {
     public void setPoint(@RequestParam String nickname, @RequestParam int point) {
         profileService.setPoint(nickname, point);
     }
+
+    @ResponseBody
+    @PostMapping("/user/profile/point/minus")
+    public void minusPoint(@RequestParam String nickname, @RequestParam int point) {
+        profileService.minusPoint(nickname, point);
+    }
 }

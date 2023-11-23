@@ -171,11 +171,16 @@ public class QaRepository {
 
         String getInfoSql = "select qa_type, course_name, status from qa where qa_key = ?;";
         for(int key : qaKeys) {
-            List<QaListDto> tempList = jdbcTemplate.query(getInfoSql, (rs, rowNum) -> {
-                return new QaListDto(key, rs.getString("qa_type"),
+            List<QaAnswerList> tempList = jdbcTemplate.query(getInfoSql, (rs, rowNum) -> {
+                return new QaAnswerList(key, rs.getString("qa_type"),
                         rs.getString("course_name"), rs.getBoolean("status"));
             }, key);
-            list.add(tempList.get(0));
+            QaAnswerList a = tempList.get(0);
+            String status = "진행";
+            if(a.getStatus())
+                status = "완료";
+            QaListDto dto = new QaListDto(a.getQaKey(), a.getType(), a.getCourse(), status);
+            list.add(dto);
         }
 
         return list;

@@ -164,4 +164,8 @@ public class ProfileService {
     public void setPoint(String nickname, int point) {
         profileRepository.setPoint(nickname, point);
     }
+
+    public void minusPoint(String nickname, int point) {
+        profileRepository.minusPoint(nickname, point);
+    }
 }

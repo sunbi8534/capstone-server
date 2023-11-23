@@ -246,7 +246,12 @@ public class ProfileRepository {
     }
 
     public void setPoint(String nickname, int point) {
-        String setPointSql = "update user set point = ? where nickname = ?;";
+        String setPointSql = "update user set point = point + ? where nickname = ?;";
+        jdbcTemplate.update(setPointSql, point, nickname);
+    }
+
+    public void minusPoint(String nickname, int point) {
+        String setPointSql = "update user set point = point - ? where nickname = ?;";
         jdbcTemplate.update(setPointSql, point, nickname);
     }
 
