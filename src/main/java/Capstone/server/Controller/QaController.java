@@ -69,7 +69,7 @@ public class QaController {
 
     @ResponseBody
     @GetMapping("/user/qa/ask") //D
-    public List<QaListDto> getAskList(@RequestParam String nickname) {
+    public List<QaAskListDto> getAskList(@RequestParam String nickname) {
         return qaService.getQaAskList(nickname);
     }
 

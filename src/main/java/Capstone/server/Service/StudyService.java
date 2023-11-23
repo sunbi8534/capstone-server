@@ -151,6 +151,7 @@ public class StudyService {
         }
 
         String result = chatGptService.getQuiz(allContents, info.isType());
+        System.out.println(result);
         result = "[" + result + "]";
         try {
             ObjectMapper objectMapper = new ObjectMapper();

@@ -12,7 +12,7 @@ public class OpenAIRestTemplateConfig {
     @Qualifier("openaiRestTemplate")
     public RestTemplate openaiRestTemplate() {
         RestTemplate restTemplate = new RestTemplate();
-        String openaiApiKey = "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";
+        String openaiApiKey = "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";
         restTemplate.getInterceptors().add((request, body, execution) -> {
             request.getHeaders().add("Authorization", "Bearer " + openaiApiKey);
             return execution.execute(request, body);

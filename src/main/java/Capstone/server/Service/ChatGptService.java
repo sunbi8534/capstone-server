@@ -3,10 +3,6 @@ package Capstone.server.Service;
 import Capstone.server.DTO.ChatGpt.ChatRequest;
 import Capstone.server.DTO.ChatGpt.ChatResponse;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -19,7 +15,7 @@ public class ChatGptService {
     }
 
     public String getQuiz(StringBuilder contents, boolean type) {
-        String model = "gpt-3.5-turbo-16k";
+        String model = "gpt-3.5-turbo-1106";
         String apiUrl = "https://api.openai.com/v1/chat/completions";
 
         if(type) {

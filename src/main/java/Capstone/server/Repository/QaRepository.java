@@ -135,20 +135,28 @@ public class QaRepository {
         return qaBriefDtos;
     }
 
-    public List<QaListDto> getQaAskList(String nickname) {
-        List<QaListDto> list = new ArrayList<>();
+    public List<QaAskListDto> getQaAskList(String nickname) {
+        List<QaAskListDto> list = new ArrayList<>();
         String getAskSql = "select qa_key from handle_ask where nickname = ?;";
         List<Integer> qaKeys = jdbcTemplate.query(getAskSql, (rs, rowNum) -> {
             return Integer.valueOf(rs.getInt("qa_key"));
         }, nickname);
 
-        String getInfoSql = "select qa_type, course_name, status from qa where qa_key = ?;";
+        String getInfoSql = "select qa_type, course_name, is_watching, is_solving, status from qa where qa_key = ?;";
         for(int key : qaKeys) {
-            List<QaListDto> tempList = jdbcTemplate.query(getInfoSql, (rs, rowNum) -> {
-                return new QaListDto(key, rs.getString("qa_type"),
-                        rs.getString("course_name"), rs.getBoolean("status"));
+            List<QaAskList> tempList = jdbcTemplate.query(getInfoSql, (rs, rowNum) -> {
+                return new QaAskList(key, rs.getString("qa_type"),
+                        rs.getString("course_name"), rs.getBoolean("is_watching"), rs.getBoolean("is_solving"), rs.getBoolean("status"));
             }, key);
-            list.add(tempList.get(0));
+            String status = "미답";
+
+            QaAskList tmp = tempList.get(0);
+            if(tmp.getIsSolving() || tmp.getIsWatching())
+                status = "진행";
+            if(tmp.getStatus())
+                status = "완료";
+            QaAskListDto dto = new QaAskListDto(tmp.getQaKey(), tmp.getType(), tmp.getCourse(), status);
+            list.add(dto);
         }
 
         return list;
@@ -251,7 +259,6 @@ public class QaRepository {
         String getMsgNumSql = "select qa_num from qa where qa_key = ?;";
         String chatRoomName = "qa_chat_" + String.valueOf(qaKey);
         String resetQaChatSql = "delete from " + chatRoomName + " where msg_num >= ?;";
-        String setHandleSql = "delete from handle_answer where nickname = ? and qa_key = ?;";
         String updateHandleGiveupSql = "insert into handle_giveup (nickname, qa_key) values (?, ?);";
 
         List<Integer> num = jdbcTemplate.query(getMsgNumSql, (rs, rowNum) -> {
@@ -263,7 +270,6 @@ public class QaRepository {
         jdbcTemplate.update(setGiveUpSql1, qaKey);
         jdbcTemplate.update(setGiveUpSql2, qaKey);
         jdbcTemplate.update(resetQaChatSql, msgNum+1);
-        jdbcTemplate.update(setHandleSql, nickname, qaKey);
         jdbcTemplate.update(updateHandleGiveupSql, nickname, qaKey);
     }
 

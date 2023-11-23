@@ -76,7 +76,7 @@ public class StudyRepository {
 
         String makeStudySql = "insert into study_info (room_name, course_name, max_num," +
                 " cur_num, leader, start_date, is_open, code, study_introduction) values (?, ?, ?, ?, ?, ?, ?, ?, ?);";
-        jdbcTemplate.update(makeStudySql, info.getRoomName(), info.getCourse(), info.getMaxNum(), 0,
+        jdbcTemplate.update(makeStudySql, info.getRoomName(), info.getCourse(), info.getMaxNum(), 1,
                 info.getLeader(), info.getStartDate(), info.getIsOpen(), info.getCode(), info.getStudyIntroduction());
 
         String getKeySql = "select room_key from study_info where room_name = ?;";

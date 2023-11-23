@@ -50,7 +50,7 @@ public class QaService {
         return qaRepository.getQaMsgs(qaKey, nickname);
     }
 
-    public List<QaListDto> getQaAskList(String nickname) {
+    public List<QaAskListDto> getQaAskList(String nickname) {
         return qaRepository.getQaAskList(nickname);
     }
 
