@@ -64,6 +64,18 @@ public class QaRepository {
         return qaKey.get(0);
     }
 
+    public boolean isReview(int qaKey) {
+        String sql = "select review from qa where qa_key = ?;";
+        List<Integer> review = jdbcTemplate.query(sql, (rs, rowNum) -> {
+            return Integer.valueOf("review");
+        }, qaKey);
+
+        if(review.get(0) == 0)
+            return false;
+        else
+            return true;
+    }
+
     public List<QaMsgDto> getQa(int qaKey) {
         String chatRoomName = "qa_chat_" + String.valueOf(qaKey);
         String getMsgSql = "select nickname, type, msg, image, time from " + chatRoomName + " order by msg_num ASC;";

@@ -171,4 +171,10 @@ public class ProfileController {
     public void minusPoint(@RequestParam String nickname, @RequestParam int point) {
         profileService.minusPoint(nickname, point);
     }
+
+    @ResponseBody
+    @GetMapping("/user/profile/isReview")
+    public boolean isReview(String nickname) {
+        return profileService.isReview(nickname);
+    }
 }

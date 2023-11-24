@@ -38,6 +38,12 @@ public class QaController {
     }
 
     @ResponseBody
+    @GetMapping("/qa/isReview")
+    public boolean isReview(@RequestParam int qaKey) {
+        return qaService.isReview(qaKey);
+    }
+
+    @ResponseBody
     @PostMapping("/qa/giveup")  //D
     public void qaGiveUp(@RequestParam int qaKey, @RequestParam String nickname) {
         qaService.qaGiveUp(qaKey, nickname);

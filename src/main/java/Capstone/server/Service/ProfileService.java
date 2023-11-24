@@ -161,6 +161,14 @@ public class ProfileService {
         }
     }
 
+    public boolean isReview(String nickname) {
+        double review = getUserReview(nickname);
+        if(review == 0)
+            return false;
+        else
+            return true;
+    }
+
     public void setPoint(String nickname, int point) {
         profileRepository.setPoint(nickname, point);
     }

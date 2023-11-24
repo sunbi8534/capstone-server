@@ -22,6 +22,10 @@ public class QaService {
         return qaRepository.enrollQa(qaDto);
     }
 
+    public boolean isReview(int qaKey) {
+        return qaRepository.isReview(qaKey);
+    }
+
     public String deleteQa(int qaKey) {
         return qaRepository.deleteQa(qaKey);
     }
