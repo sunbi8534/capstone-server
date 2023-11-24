@@ -90,6 +90,12 @@ public class StudyController {
     }
 
     @ResponseBody
+    @GetMapping("/study/leader")
+    public String getLeader(@RequestParam int roomKey) {
+        return studyService.getLeader(roomKey);
+    }
+
+    @ResponseBody
     @PostMapping("/study/enroll/File/{roomKey}/{folderKey}/{nickname}")
     public String enrollFile(@PathVariable int roomKey, @PathVariable int folderKey, @PathVariable String nickname,
                            @RequestParam MultipartFile file) {

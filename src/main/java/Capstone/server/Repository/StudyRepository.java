@@ -176,6 +176,15 @@ public class StudyRepository {
         return friendInfo;
     }
 
+    public String getLeader(int roomKey) {
+        String sql = "select leader from study_info where room_key = ?;";
+        List<String> leader = jdbcTemplate.query(sql, (rs, rowNum) -> {
+            return String.valueOf(rs.getString("leader"));
+        }, roomKey);
+
+        return leader.get(0);
+    }
+
     public List<Msg> getAllMsgs(int roomKey, String nickname) {
         String chatRoomName = "study_chat_" + String.valueOf(roomKey);
         String getMsgSql = "select msg_num, nickname, type, msg, image, time from " + chatRoomName + ";";

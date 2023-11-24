@@ -57,6 +57,10 @@ public class StudyService {
         return studyRepository.enterStudy(roomKey, nickname);
     }
 
+    public String getLeader(int roomKey) {
+        return studyRepository.getLeader(roomKey);
+    }
+
     public List<MsgDto> getAllMsg(int roomKey, String nickname) {
         List<MsgDto> msgDtos = new ArrayList<>();
 
