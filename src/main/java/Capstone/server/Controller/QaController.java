@@ -50,7 +50,7 @@ public class QaController {
     }
 
     @ResponseBody
-    @PostMapping("/qa/answer/{qaKey}") //D
+    @PostMapping("/qa/answer/{qaKey}") //D..
     public void qaSolve(@PathVariable int qaKey) {
         qaService.qaSolve(qaKey);
     }
