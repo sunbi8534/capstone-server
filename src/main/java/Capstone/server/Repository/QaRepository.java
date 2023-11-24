@@ -67,7 +67,7 @@ public class QaRepository {
     public boolean isReview(int qaKey) {
         String sql = "select review from qa where qa_key = ?;";
         List<Integer> review = jdbcTemplate.query(sql, (rs, rowNum) -> {
-            return Integer.valueOf("review");
+            return Integer.valueOf(rs.getInt("review"));
         }, qaKey);
 
         if(review.get(0) == 0)
@@ -163,7 +163,7 @@ public class QaRepository {
             String status = "미답";
 
             QaAskList tmp = tempList.get(0);
-            if(tmp.getIsSolving() || tmp.getIsWatching())
+            if(tmp.getIsSolving())
                 status = "진행";
             if(tmp.getStatus())
                 status = "완료";
@@ -377,7 +377,7 @@ public class QaRepository {
 
         QaStatus s = list.get(0);
         String status = "미답";
-        if(s.getIsWatching() || s.getIsSolving())
+        if(s.getIsSolving())
             status = "진행";
         if(s.getStatus())
             status = "완료";
