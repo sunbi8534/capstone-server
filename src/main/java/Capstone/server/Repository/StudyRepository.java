@@ -171,8 +171,6 @@ public class StudyRepository {
 
         List<UserInfoMinimumDto> friendInfo = new ArrayList<>();
         for(String name : friends) {
-            if (nickname.equals(name))
-                continue;
             friendInfo.add(new UserInfoMinimumDto(name, profileService.getProfileImage(name)));
         }
         return friendInfo;
