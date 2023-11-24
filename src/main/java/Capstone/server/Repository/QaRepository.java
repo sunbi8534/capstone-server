@@ -355,4 +355,21 @@ public class QaRepository {
 
         return time.get(0);
     }
+
+    public String getQaStatus(int qaKey) {
+        String getSql = "select is_watching, is_solving, status from qa where qa_key = ?;";
+        List<QaStatus> list = jdbcTemplate.query(getSql, (rs, rowNum) -> {
+            return new QaStatus(rs.getBoolean("is_watching"), rs.getBoolean("is_solving"),
+                    rs.getBoolean("status"));
+        }, qaKey);
+
+        QaStatus s = list.get(0);
+        String status = "미답";
+        if(s.getIsWatching() || s.getIsSolving())
+            status = "진행";
+        if(s.getStatus())
+            status = "완료";
+
+        return status;
+    }
 }

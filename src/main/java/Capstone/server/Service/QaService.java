@@ -68,4 +68,7 @@ public class QaService {
 
     public long getTime(int qaKey) { return qaRepository.getTime(qaKey); }
 
+    public String getQaStatus(int qaKey) {
+        return qaRepository.getQaStatus(qaKey);
+    }
 }

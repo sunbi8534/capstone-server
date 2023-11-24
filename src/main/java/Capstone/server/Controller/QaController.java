@@ -89,4 +89,9 @@ public class QaController {
     @GetMapping("/qa/time")
     public long getTime(@RequestParam int qaKey) { return qaService.getTime(qaKey); }
 
+    @ResponseBody
+    @GetMapping("/qa/status")
+    public String getQaStatus(@RequestParam int qaKey) {
+        return qaService.getQaStatus(qaKey);
+    }
 }
