@@ -100,7 +100,13 @@ public class ProfileRepository {
         }
     }
 
+    public void deleteCourseAll(String nickname) {
+        String sql = "delete from take where nickname = ?;";
+        jdbcTemplate.update(sql, nickname);
+    }
+
     public void setCourseAll(String nickname, CourseAllDto course) {
+        deleteCourseAll(nickname);
         setCourse(nickname, course.getCurrentCourses(), true);
         setCourse(nickname, course.getPastCourses(), false);
     }
