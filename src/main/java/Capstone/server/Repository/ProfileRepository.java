@@ -34,7 +34,21 @@ public class ProfileRepository {
                     rs.getInt("study_cnt"));
         }, nickname);
 
-        return userInfo.get(0);
+        UserProfileInfo info = userInfo.get(0);
+        info.setStudy_cnt(getStudyCnt(nickname));
+        return info;
+    }
+
+    public int getStudyCnt(String nickname) {
+        String sql = "select room_key from study_chat_in where nickname = ?;";
+        List<Integer> roomKey = jdbcTemplate.query(sql, (rs, rowNum) -> {
+            return Integer.valueOf(rs.getInt("room_key"));
+        }, nickname);
+
+        if(roomKey.isEmpty())
+            return 0;
+        else
+            return roomKey.size();
     }
 
     public UserCourseInfo getUserCourseInfo(String nickname) {
