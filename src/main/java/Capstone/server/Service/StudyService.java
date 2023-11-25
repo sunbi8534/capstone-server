@@ -125,7 +125,7 @@ public class StudyService {
                 return "already enroll";
 
             if(!file.getContentType().equalsIgnoreCase("application/pdf")) {
-                return "it is not pdf File";
+                return "no pdf File";
             }
             InputStream inputStream = file.getInputStream();
             PDDocument document = PDDocument.load(inputStream);
@@ -139,11 +139,15 @@ public class StudyService {
             e.printStackTrace();
         }
 
-        return "hello";
+        return "ok";
     }
 
     public String getCode(int roomKey) {
         return studyRepository.getCode(roomKey);
+    }
+
+    public void makeFolder(int roomKey, String folderName) {
+        studyRepository.makeFolder(roomKey, folderName);
     }
 
     public List<QuizDto> getQuiz(StudyQuizInfoDto info) {
@@ -158,17 +162,35 @@ public class StudyService {
             allContents.append(c);
         }
 
-        String result = chatGptService.getQuiz(allContents, info.isType());
+        String result = chatGptService.getQuiz(allContents, info.getQuizNum());
         System.out.println(result);
-        result = "[" + result + "]";
+        String limiter = "```json";
+        int index = result.indexOf(limiter);
+        if(index != -1) {
+            result = result.substring(index+8, result.length());
+            System.out.println("hell");
+            System.out.println(result);
+            limiter = "```";
+            index = result.indexOf(limiter);
+            result = result.substring(0, index);
+        }
+        System.out.println(result);
         try {
             ObjectMapper objectMapper = new ObjectMapper();
             quiz = objectMapper.readValue(result, objectMapper.getTypeFactory().constructCollectionType(List.class, QuizDto.class));
         } catch (JsonProcessingException e) {
             e.printStackTrace();
         }
-        System.out.println(result);
+
         return quiz;
+    }
+
+    public List<String> getEnrollUserList(int roomKey, int folderKey) {
+        return studyRepository.getEnrollUserList(roomKey, folderKey);
+    }
+
+    public void deleteUserInFolder(int roomKey, int folderKey, String nickname) {
+        studyRepository.deleteUserInFolder(roomKey, folderKey, nickname);
     }
 
     public List<StudyQuizListDto> getQuizList(int roomKey) {

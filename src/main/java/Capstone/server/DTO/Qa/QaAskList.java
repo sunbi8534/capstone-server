@@ -12,4 +12,5 @@ public class QaAskList {
     Boolean isWatching;
     Boolean isSolving;
     Boolean status;
+    long time;
 }

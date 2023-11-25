@@ -8,6 +8,7 @@ import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
 
 import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -150,21 +151,32 @@ public class QaRepository {
     public List<QaAskListDto> getQaAskList(String nickname) {
         List<QaAskListDto> list = new ArrayList<>();
         String getAskSql = "select qa_key from handle_ask where nickname = ?;";
+        String updateStatusSql = "update qa set status = true where qa_key = ?;";
         List<Integer> qaKeys = jdbcTemplate.query(getAskSql, (rs, rowNum) -> {
             return Integer.valueOf(rs.getInt("qa_key"));
         }, nickname);
 
-        String getInfoSql = "select qa_type, course_name, is_watching, is_solving, status from qa where qa_key = ?;";
+        String getInfoSql = "select qa_type, course_name, is_watching, is_solving, status, time from qa where qa_key = ?;";
         for(int key : qaKeys) {
             List<QaAskList> tempList = jdbcTemplate.query(getInfoSql, (rs, rowNum) -> {
                 return new QaAskList(key, rs.getString("qa_type"),
-                        rs.getString("course_name"), rs.getBoolean("is_watching"), rs.getBoolean("is_solving"), rs.getBoolean("status"));
+                        rs.getString("course_name"), rs.getBoolean("is_watching"), rs.getBoolean("is_solving"),
+                        rs.getBoolean("status"), rs.getLong("time"));
             }, key);
             String status = "미답";
 
             QaAskList tmp = tempList.get(0);
-            if(tmp.getIsSolving())
+            Instant currentTime = Instant.now();
+            Instant pastTime = currentTime.minus(24, ChronoUnit.HOURS);
+            Instant epochInstant;
+
+            if(tmp.getIsSolving()) {
                 status = "진행";
+                epochInstant = Instant.ofEpochSecond(tmp.getTime());
+                if(epochInstant.isBefore(pastTime)) {
+                    jdbcTemplate.update(updateStatusSql, key);
+                }
+            }
             if(tmp.getStatus())
                 status = "완료";
             QaAskListDto dto = new QaAskListDto(tmp.getQaKey(), tmp.getType(), tmp.getCourse(), status);

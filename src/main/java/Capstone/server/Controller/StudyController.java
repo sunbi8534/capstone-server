@@ -109,14 +109,32 @@ public class StudyController {
     }
 
     @ResponseBody
+    @PostMapping("/study/folder/{roomKey}/{folderName}")
+    public void makeFolder(@PathVariable int roomKey, @PathVariable String folderName) {
+        studyService.makeFolder(roomKey, folderName);
+    }
+
+    @ResponseBody
     @GetMapping("/study/quiz")
     public List<QuizDto> getQuiz(@RequestBody StudyQuizInfoDto info) {
         return studyService.getQuiz(info);
     }
 
     @ResponseBody
-    @GetMapping("/study/quiz/list")
-    public List<StudyQuizListDto> getQuizList(@RequestParam int roomKey) {
+    @GetMapping("/study/{roomKey}/{folderKey}")
+    public List<String> getEnrollUserList(@PathVariable int roomKey, @PathVariable int folderKey) {
+        return studyService.getEnrollUserList(roomKey, folderKey);
+    }
+
+    @ResponseBody
+    @PostMapping("/study/{roomKey}/{folderKey}")
+    public void deleteUserInFolder(@PathVariable int roomKey, @PathVariable int folderKey, @RequestParam String nickname) {
+        studyService.deleteUserInFolder(roomKey, folderKey, nickname);
+    }
+
+    @ResponseBody
+    @GetMapping("/study/folder/list")
+    public List<StudyQuizListDto> getFolderList(@RequestParam int roomKey) {
         return studyService.getQuizList(roomKey);
     }
 }

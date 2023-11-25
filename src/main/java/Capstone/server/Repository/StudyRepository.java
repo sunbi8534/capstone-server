@@ -331,6 +331,27 @@ public class StudyRepository {
         return list;
     }
 
+    public List<String> getEnrollUserList(int roomKey, int folderKey) {
+        String tableName = "study_quiz_" + String.valueOf(roomKey);
+        String sql = "select nickname from " + tableName + " where folder_key = ?;";
+        List<String> nickname = jdbcTemplate.query(sql, (rs, rowNum) -> {
+            return String.valueOf(rs.getString("nickname"));
+        }, folderKey);
+
+        return nickname;
+    }
+
+    public void deleteUserInFolder(int roomKey, int folderKey, String nickname) {
+        String tableName = "study_quiz_" + String.valueOf(roomKey);
+        String sql = "delete from " + tableName + " where folder_key = ? and nickname = ?;";
+        jdbcTemplate.update(sql, folderKey, nickname);
+    }
+
+    public void makeFolder(int roomKey, String folderName) {
+        String sql = "insert into study_quiz_info (room_key, folder_name) values (?, ?);";
+        jdbcTemplate.update(sql, roomKey, folderName);
+    }
+
     public List<String> getQuizContents(StudyQuizInfoDto info) {
         String studyQuizTableName = "study_quiz_" + String.valueOf(info.getRoomKey());
         String getContentsSql = "select contents from " + studyQuizTableName + " where folder_key = ?;";
