@@ -11,4 +11,5 @@ public class QaAnswerList {
     String type;
     String course;
     Boolean status;
+    long time;
 }

@@ -174,7 +174,7 @@ public class QaRepository {
                 status = "진행";
                 epochInstant = Instant.ofEpochSecond(tmp.getTime());
                 if(epochInstant.isBefore(pastTime)) {
-                    jdbcTemplate.update(updateStatusSql, key);
+                    qaFinish(key, 0);
                 }
             }
             if(tmp.getStatus())
@@ -193,14 +193,24 @@ public class QaRepository {
             return Integer.valueOf(rs.getInt("qa_key"));
         }, nickname);
 
-        String getInfoSql = "select qa_type, course_name, status from qa where qa_key = ?;";
+        String getInfoSql = "select qa_type, course_name, status, time from qa where qa_key = ?;";
+        Instant currentTime = Instant.now();
+        Instant pastTime = currentTime.minus(24, ChronoUnit.HOURS);
+        Instant epochInstant;
+
         for(int key : qaKeys) {
             List<QaAnswerList> tempList = jdbcTemplate.query(getInfoSql, (rs, rowNum) -> {
                 return new QaAnswerList(key, rs.getString("qa_type"),
-                        rs.getString("course_name"), rs.getBoolean("status"));
+                        rs.getString("course_name"), rs.getBoolean("status"), rs.getLong("time"));
             }, key);
             QaAnswerList a = tempList.get(0);
+
             String status = "진행";
+            epochInstant = Instant.ofEpochSecond(a.getTime());
+            if(epochInstant.isBefore(pastTime)) {
+                qaFinish(key, 0);
+            }
+
             if(a.getStatus())
                 status = "완료";
             QaListDto dto = new QaListDto(a.getQaKey(), a.getType(), a.getCourse(), status);
