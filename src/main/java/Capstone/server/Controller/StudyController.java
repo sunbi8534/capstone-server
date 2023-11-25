@@ -90,6 +90,12 @@ public class StudyController {
     }
 
     @ResponseBody
+    @GetMapping("/study/code")
+    public String getCode(@RequestParam int roomKey) {
+        return studyService.getCode(roomKey);
+    }
+
+    @ResponseBody
     @GetMapping("/study/leader")
     public String getLeader(@RequestParam int roomKey) {
         return studyService.getLeader(roomKey);

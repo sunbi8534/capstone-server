@@ -294,6 +294,15 @@ public class StudyRepository {
         jdbcTemplate.update(outSql2, nickname, roomKey);
     }
 
+    public String getCode(int roomKey) {
+        String sql = "select code from study_info where room_key = ?;";
+        List<String> code = jdbcTemplate.query(sql, (rs, rowNum) -> {
+            return String.valueOf(rs.getString("code"));
+        }, roomKey);
+
+        return code.get(0);
+    }
+
     public boolean checkFileEnrollCan(int roomKey, int folderKey, String nickname) {
         String quizTableName = "study_quiz_" + String.valueOf(roomKey);
         String getSql = "select nickname from " + quizTableName + " where folder_key = ? and nickname = ?;";

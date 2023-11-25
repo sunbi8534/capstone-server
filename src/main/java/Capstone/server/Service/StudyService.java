@@ -142,6 +142,10 @@ public class StudyService {
         return "hello";
     }
 
+    public String getCode(int roomKey) {
+        return studyRepository.getCode(roomKey);
+    }
+
     public List<QuizDto> getQuiz(StudyQuizInfoDto info) {
         List<QuizDto> quiz = new ArrayList<>();
         List<String> contents = studyRepository.getQuizContents(info);
