@@ -275,6 +275,15 @@ public class ProfileRepository {
         jdbcTemplate.update(setPointSql, point, nickname);
     }
 
+    public int getPoint(String nickname) {
+        String sql = "select point from user where nickname = ?;";
+        List<Integer> point = jdbcTemplate.query(sql, (rs, rowNum) -> {
+            return Integer.valueOf(rs.getInt("point"));
+        }, nickname);
+
+        return point.get(0);
+    }
+
     @AllArgsConstructor
     @Getter
     class Relationship {

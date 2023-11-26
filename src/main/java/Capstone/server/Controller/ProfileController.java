@@ -177,4 +177,10 @@ public class ProfileController {
     public boolean isReview(String nickname) {
         return profileService.isReview(nickname);
     }
+
+    @ResponseBody
+    @GetMapping("/user/getPoint")
+    public int getPoint(@RequestParam String nickname) {
+        return profileService.getPoint(nickname);
+    }
 }

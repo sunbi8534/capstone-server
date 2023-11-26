@@ -52,6 +52,10 @@ public class ProfileService {
         profileRepository.setProfileImage(nickname, image.getImg());
     }
 
+    public int getPoint(String nickname) {
+        return profileRepository.getPoint(nickname);
+    }
+
     public void setIntroduction(String nickname, String introduction) {
         profileRepository.setIntroduction(nickname, introduction);
     }

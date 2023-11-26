@@ -33,7 +33,7 @@ public class StudyRepository {
 
         String findStudySql = "select room_key, room_name, course_name, max_num," +
                 " cur_num, leader, start_date, is_open, study_introduction from study_info where course_name = ?;";
-
+        //내가 가입한 스터디 뺴기
 
         for(String c : course) {
             List<StudyInfoDto> infos = jdbcTemplate.query(findStudySql, (rs, rowNum) -> {
