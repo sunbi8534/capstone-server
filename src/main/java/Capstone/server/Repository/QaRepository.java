@@ -182,7 +182,7 @@ public class QaRepository {
             }
             if(tmp.getStatus())
                 status = "완료";
-            else {
+            else if(tmp.getTime() != 0) {
                 epochInstant = Instant.ofEpochSecond(tmp.getTime());
                 if(epochInstant.isBefore(pastTime)) {
                     qaFinish(key, 0);
@@ -220,7 +220,7 @@ public class QaRepository {
 
             if(a.getStatus())
                 status = "완료";
-            else {
+            else if(a.getTime() != 0){
                 epochInstant = Instant.ofEpochSecond(a.getTime());
                 if(epochInstant.isBefore(pastTime)) {
                     qaFinish(key, 0);
