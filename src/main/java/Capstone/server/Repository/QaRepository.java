@@ -231,7 +231,6 @@ public class QaRepository {
         String sql = "select point, questioner, solver from qa where qa_key = ?;";
         String updateSql1 = "update qa set status = true where qa_key = ?;";
         String addUserPointSql = "update user set point = point + ? where nickname = ?;";
-        String minusUserPointSql = "update user set point = point - ? where nickname = ?;";
         String updateReviewSql = "update qa set review = ? where qa_key = ?;";
 
         List<FinishInfo> finishInfos = jdbcTemplate.query(sql, (rs, rowNum) -> {
@@ -242,7 +241,6 @@ public class QaRepository {
 
         jdbcTemplate.update(updateSql1, qaKey);
         jdbcTemplate.update(addUserPointSql, info.getPoint(), info.getSolver());
-        jdbcTemplate.update(minusUserPointSql, info.getPoint(), info.getQuestioner());
         jdbcTemplate.update(updateReviewSql, review, qaKey);
     }
 
