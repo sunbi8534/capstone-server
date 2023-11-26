@@ -10,4 +10,5 @@ public class RoomJoinInfo {
     int curNum;
     Boolean isOpen;
     String code;
+    String course;
 }

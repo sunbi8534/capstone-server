@@ -91,7 +91,7 @@ public class StudyRepository {
     public String makeStudyRoom(StudyMakeDto info) {
         if(!checkDupRoomName(info.getRoomName()))
             return "false";
-        if(!checkDupCourse(info.getLeader(), info.getCourse()))
+        if(!checkDup(info.getLeader(), info.getCourse()))
             return "false";
 
         String makeStudySql = "insert into study_info (room_name, course_name, max_num," +
@@ -139,26 +139,35 @@ public class StudyRepository {
             return false;
     }
 
-    public boolean checkDupCourse(String nickname, String course) {
-        String sql = "select leader from study_info where course_name = ?;";
-        List<String> leader = jdbcTemplate.query(sql, (rs, rowNum) -> {
-            return String.valueOf(rs.getString("leader"));
-        }, course);
 
-        if(leader.isEmpty())
+    public boolean checkDup(String nickname, String course) {
+        String sql = "select room_key from study_chat_in where nickname = ?;";
+        List<Integer> roomKey = jdbcTemplate.query(sql, (rs, rowNum) -> {
+            return Integer.valueOf(rs.getInt("room_key"));
+        }, nickname);
+
+        if(roomKey.isEmpty())
             return true;
-        for(String s : leader) {
-            if (s.equals(nickname))
+        String getSql = "select course_name from study_info where room_key = ?;";
+
+        String c;
+        for(int key : roomKey) {
+            List<String> courseName = jdbcTemplate.query(getSql, (rs, rowNum) -> {
+                return String.valueOf(rs.getString("course_name"));
+            }, key);
+            c = courseName.get(0);
+            if(c.equals(course))
                 return false;
         }
+
         return true;
     }
 
     public String joinStudy(String nickname, StudyJoinDto joinInfo) {
-        String checkCodeSql = "select max_num, cur_num, is_open, code from study_info where room_key = ?;";
+        String checkCodeSql = "select max_num, cur_num, is_open, code, course from study_info where room_key = ?;";
         List<RoomJoinInfo> v = jdbcTemplate.query(checkCodeSql, (rs, rowNum) -> {
             return new RoomJoinInfo(rs.getInt("max_num"), rs.getInt("cur_num"),
-                    rs.getBoolean("is_open"), rs.getString("code"));
+                    rs.getBoolean("is_open"), rs.getString("code"), rs.getString("course"));
         }, joinInfo.getRoomKey());
 
         RoomJoinInfo info = v.get(0);
@@ -167,6 +176,8 @@ public class StudyRepository {
         } else if(!info.getIsOpen()) {
             if(!info.getCode().equals(joinInfo.getCode()))
                 return "codeError";
+        } else if(!checkDup(nickname, info.getCourse())) {
+            return "dupCourse";
         }
 
         String insSql = "update study_info set cur_num = cur_num + 1 where room_key = ?;";
