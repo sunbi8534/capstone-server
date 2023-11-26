@@ -179,13 +179,16 @@ public class QaRepository {
 
             if(tmp.getIsSolving()) {
                 status = "진행";
-                epochInstant = Instant.ofEpochSecond(tmp.getTime());
-                if(epochInstant.isBefore(pastTime)) {
-                    qaFinish(key, 0);
-                }
             }
             if(tmp.getStatus())
                 status = "완료";
+            else {
+                epochInstant = Instant.ofEpochSecond(tmp.getTime());
+                if(epochInstant.isBefore(pastTime)) {
+                    qaFinish(key, 0);
+                    status = "완료";
+                }
+            }
             QaAskListDto dto = new QaAskListDto(tmp.getQaKey(), tmp.getType(), tmp.getCourse(), status);
             list.add(dto);
         }
@@ -213,13 +216,17 @@ public class QaRepository {
             QaAnswerList a = tempList.get(0);
 
             String status = "진행";
-            epochInstant = Instant.ofEpochSecond(a.getTime());
-            if(epochInstant.isBefore(pastTime)) {
-                qaFinish(key, 0);
-            }
+
 
             if(a.getStatus())
                 status = "완료";
+            else {
+                epochInstant = Instant.ofEpochSecond(a.getTime());
+                if(epochInstant.isBefore(pastTime)) {
+                    qaFinish(key, 0);
+                    status = "완료";
+                }
+            }
             QaListDto dto = new QaListDto(a.getQaKey(), a.getType(), a.getCourse(), status);
             list.add(dto);
         }
