@@ -33,7 +33,7 @@ public class StudyRepository {
 
         String findStudySql = "select room_key, room_name, course_name, max_num," +
                 " cur_num, leader, start_date, is_open, study_introduction from study_info where course_name = ?;";
-        //내가 가입한 스터디 뺴기
+
 
         for(String c : course) {
             List<StudyInfoDto> infos = jdbcTemplate.query(findStudySql, (rs, rowNum) -> {
@@ -52,6 +52,20 @@ public class StudyRepository {
                 remove.add(s);
         }
         studyInfoDtos.removeAll(remove);
+
+        String sq = "select room_key from study_chat_in where nickname = ?;";
+        List<Integer> k = jdbcTemplate.query(sq, (rs, rowNum) -> {
+            return Integer.valueOf(rs.getInt("room_key"));
+        }, nickname);
+        if(!k.isEmpty()) {
+            List<StudyInfoDto> removeKey = new ArrayList<>();
+            for(StudyInfoDto s : studyInfoDtos) {
+                if(k.contains(s.getRoomKey()))
+                    removeKey.add(s);
+            }
+            studyInfoDtos.removeAll(removeKey);
+        }
+
 
         if (roomStatus.getIsAll())
             return studyInfoDtos;
@@ -76,6 +90,8 @@ public class StudyRepository {
 
     public String makeStudyRoom(StudyMakeDto info) {
         if(!checkDupRoomName(info.getRoomName()))
+            return "false";
+        if(!checkDupCourse(info.getLeader(), info.getCourse()))
             return "false";
 
         String makeStudySql = "insert into study_info (room_name, course_name, max_num," +
@@ -121,6 +137,21 @@ public class StudyRepository {
             return true;
         else
             return false;
+    }
+
+    public boolean checkDupCourse(String nickname, String course) {
+        String sql = "select leader from study_info where course_name = ?;";
+        List<String> leader = jdbcTemplate.query(sql, (rs, rowNum) -> {
+            return String.valueOf(rs.getString("leader"));
+        }, course);
+
+        if(leader.isEmpty())
+            return true;
+        for(String s : leader) {
+            if (s.equals(nickname))
+                return false;
+        }
+        return true;
     }
 
     public String joinStudy(String nickname, StudyJoinDto joinInfo) {
