@@ -13,4 +13,5 @@ public class QuizDto {
     int quizNum;
     String question;
     String answer;
+    Boolean isSolved;
 }

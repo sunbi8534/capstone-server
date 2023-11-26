@@ -19,6 +19,10 @@ public class QuizService {
         return quizRepository.getMyQuiz(nickname, course);
     }
 
+    public List<String> getMyQuizFolderName(String nickname) {
+        return getMyQuizFolderName(nickname);
+    }
+
     public void makeQuizFolder(QuizMakeDto quiz) {
         quizRepository.makeQuizFolder(quiz);
     }
@@ -31,7 +35,4 @@ public class QuizService {
         quizRepository.makeQuiz(quizKey, quiz);
     }
 
-    public void updateCurNum(int quizKey, int curNum) {
-        quizRepository.updateCurNum(quizKey, curNum);
-    }
 }

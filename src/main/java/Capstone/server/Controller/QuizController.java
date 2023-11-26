@@ -25,6 +25,12 @@ public class QuizController {
     }
 
     @ResponseBody
+    @GetMapping("/user/quiz/list")
+    public List<String> getMyQuizFolderName(@RequestParam String nickname) {
+        return quizService.getMyQuizFolderName(nickname);
+    }
+
+    @ResponseBody
     @PostMapping("/user/quiz/makeFolder")
     public void makeQuizFolder(@RequestBody QuizMakeDto quiz) {
         quizService.makeQuizFolder(quiz);
@@ -40,11 +46,5 @@ public class QuizController {
     @PostMapping("/user/makeQuiz/{quizKey}")
     public void makeQuiz(@PathVariable int quizKey, @RequestBody List<QuizDto> quiz) {
         quizService.makeQuiz(quizKey, quiz);
-    }
-
-    @ResponseBody
-    @PostMapping("/user/quiz/finish/{quizKey}")
-    public void finishQuiz(@PathVariable int quizKey, int curNum) {
-        quizService.updateCurNum(quizKey, curNum);
     }
 }

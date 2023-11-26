@@ -1,11 +1,13 @@
 package Capstone.server.Repository;
 
 import Capstone.server.DTO.Quiz.QuizDto;
+import Capstone.server.DTO.Quiz.QuizInfo;
 import Capstone.server.DTO.Quiz.QuizInfoDto;
 import Capstone.server.DTO.Quiz.QuizMakeDto;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Repository
@@ -16,13 +18,41 @@ public class QuizRepository {
         this.jdbcTemplate = jdbcTemplate;
     }
     public List<QuizInfoDto> getMyQuiz(String nickname, String course) {
-        String sql = "select quiz_key, quiz_name, quiz_num, cur_num from quiz_info where course_name = ? and nickname = ?;";
-        List<QuizInfoDto> quiz = jdbcTemplate.query(sql, (rs, rowNum) -> {
-            return new QuizInfoDto(rs.getInt("quiz_key"), rs.getString("quiz_name"),
-                    rs.getInt("quiz_num"), rs.getInt("cur_num"));
+        List<QuizInfoDto> quizInfoDtos = new ArrayList<>();
+        String sql = "select quiz_key, quiz_name, quiz_num from quiz_info where course_name = ? and nickname = ?;";
+        int num;
+        List<QuizInfo> quiz = jdbcTemplate.query(sql, (rs, rowNum) -> {
+            return new QuizInfo(rs.getInt("quiz_key"), rs.getString("quiz_name"), rs.getInt("quiz_num"));
         }, course, nickname);
 
-        return quiz;
+        for(QuizInfo q : quiz) {
+            String tableName = "quiz_" + String.valueOf(q.getQuizKey());
+            String getSql = "select is_solved from " + tableName + ";";
+            List<Boolean> isDoing = jdbcTemplate.query(getSql, (rs, rowNum) -> {
+                return Boolean.valueOf(rs.getBoolean("is_solved"));
+            });
+
+            num = 0;
+            if(!isDoing.isEmpty()) {
+                for(Boolean b : isDoing) {
+                    if(!b)
+                        num++;
+                }
+            }
+            QuizInfoDto infoDto = new QuizInfoDto(q.getQuizKey(), q.getQuizName(), q.getQuizNum(), num);
+            quizInfoDtos.add(infoDto);
+        }
+
+        return quizInfoDtos;
+    }
+
+    public List<String> getMyQuizFolderName(String nickname) {
+        String sql = "select quiz_name from quiz_info where nickname = ?;";
+        List<String> quizName = jdbcTemplate.query(sql, (rs, rowNum) -> {
+            return String.valueOf(rs.getString("quiz_name"));
+        }, nickname);
+
+        return quizName;
     }
 
     public void makeQuizFolder(QuizMakeDto quiz) {
@@ -37,8 +67,8 @@ public class QuizRepository {
         else
             key = myKey.get(myKey.size() - 1) + 1;
 
-        String insertSql = "insert into quiz_info (my_key, course_name, nickname, quiz_name, quiz_num, cur_num) values" +
-                " (?, ?, ?, ?, 0, 0);";
+        String insertSql = "insert into quiz_info (my_key, course_name, nickname, quiz_name, quiz_num) values" +
+                " (?, ?, ?, ?, 0);";
         jdbcTemplate.update(insertSql, key, quiz.getCourse(), quiz.getNickname(), quiz.getQuizName());
         String getKeySql = "select quiz_key from quiz_info where my_key = ? and nickname = ?;";
 
@@ -48,16 +78,17 @@ public class QuizRepository {
         int qKey = quizKey.get(0);
 
         String tableName = "quiz_" + String.valueOf(qKey);
-        String makeSql = "create table " + tableName + " (" +
-                "num integer, question varchar(300), answer varchar(200));";
+        String makeSql = "create table " + tableName + "(" +
+                "num integer, question varchar(300), answer varchar(200), is_solved BOOL);";
         jdbcTemplate.update(makeSql);
     }
 
     public List<QuizDto> quiz(int quizKey) {
         String quizTable = "quiz_" + String.valueOf(quizKey);
-        String getQuizSql = "select num, question, answer from " + quizTable + " order by num asc;";
+        String getQuizSql = "select num, question, answer, is_solved from " + quizTable + " order by num asc;";
         List<QuizDto> quiz = jdbcTemplate.query(getQuizSql, (rs, rowNum) -> {
-            return new QuizDto(rs.getInt("num"), rs.getString("question"), rs.getString("answer"));
+            return new QuizDto(rs.getInt("num"), rs.getString("question"), rs.getString("answer"),
+                    rs.getBoolean("is_solved"));
         });
 
         return quiz;
@@ -65,20 +96,15 @@ public class QuizRepository {
 
     public void makeQuiz(int quizKey, List<QuizDto> quiz) {
         String quizTable = "quiz_" + String.valueOf(quizKey);
-        String deleteSql = "delete from " + quizTable + ";";
+        String deleteSql = "delete from " + quizTable + " where num > -1;";
         jdbcTemplate.update(deleteSql);
 
-        String insertQuizSql = "insert into " + quizTable + " (num, question, answer) values (?, ?, ?);";
+        String insertQuizSql = "insert into " + quizTable + " (num, question, answer, is_solved) values (?, ?, ?, ?);";
         for(QuizDto q : quiz) {
-            jdbcTemplate.update(insertQuizSql, q.getQuizNum(), q.getQuestion(), q.getAnswer());
+            jdbcTemplate.update(insertQuizSql, q.getQuizNum(), q.getQuestion(), q.getAnswer(), q.getIsSolved());
         }
 
-        String updateSql = "update quiz_info set quiz_num = ?, cur_num = 1 where quiz_key = ?;";
+        String updateSql = "update quiz_info set quiz_num = ? where quiz_key = ?;";
         jdbcTemplate.update(updateSql, quiz.size(), quizKey);
-    }
-
-    public void updateCurNum(int quizKey, int curNum) {
-        String sql = "update quiz_info set cur_num = ? where quiz_key = ?;";
-        jdbcTemplate.update(sql, curNum, quizKey);
     }
 }
