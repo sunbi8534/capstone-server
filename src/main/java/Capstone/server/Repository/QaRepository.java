@@ -101,19 +101,24 @@ public class QaRepository {
         String deleteQaSql = "delete from qa_chat_in where qa_key = ?;";
         String deleteHandleSql = "delete from handle_ask where qa_key = ?;";
         String dropTableSql = "drop table " + chatRoomName + ";";
-        String getIsWatchingSql = "select is_watching, is_solving from qa where qa_key = ?;";
+        String getIsWatchingSql = "select is_watching, is_solving, questioner, point from qa where qa_key = ?;";
+        String updatePointSql = "update user set point = point + ? where nickname = ?;";
+
 
         List<IsWatch> isW = jdbcTemplate.query(getIsWatchingSql, (rs, rowNum) -> {
-            return new IsWatch(rs.getBoolean("is_watching"), rs.getBoolean("is_solving"));
+            return new IsWatch(rs.getBoolean("is_watching"), rs.getBoolean("is_solving"),
+                    rs.getString("questioner"), rs.getInt("point"));
         }, qaKey);
         IsWatch watch = isW.get(0);
         if(watch.getIs_watching() || watch.getIs_solving())
             return "no";
 
+
         jdbcTemplate.update(dropTableSql);
         jdbcTemplate.update(deleteQaSql, qaKey);
         jdbcTemplate.update(deleteQaChatSql, qaKey);
         jdbcTemplate.update(deleteHandleSql, qaKey);
+        jdbcTemplate.update(updatePointSql, watch.getPoint(), watch.getNickname());
         return "ok";
     }
 

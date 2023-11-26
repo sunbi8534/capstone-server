@@ -8,4 +8,6 @@ import lombok.Getter;
 public class IsWatch {
     Boolean is_watching;
     Boolean is_solving;
+    String nickname;
+    int point;
 }
