@@ -79,10 +79,17 @@ public class QaRepository {
 
     public List<QaMsgDto> getQa(int qaKey) {
         String chatRoomName = "qa_chat_" + String.valueOf(qaKey);
+        String getAnonymity = "select is_anonymity from qa where qa_key = ?;";
+        //anonymity 여부 받아옴.
+        List<Boolean> anonymity = jdbcTemplate.query(getAnonymity, (rs, rowNum) -> {
+            return Boolean.valueOf(rs.getBoolean("is_anonymity"));
+        }, qaKey);
+        Boolean isAnonymity = anonymity.get(0);
+
         String getMsgSql = "select nickname, type, msg, image, time from " + chatRoomName + " order by msg_num ASC;";
         List<QaMsgDto> msgs = jdbcTemplate.query(getMsgSql, (rs, rowNum) -> {
             return new QaMsgDto(rs.getString("nickname"), rs.getString("type"),
-                    rs.getString("msg"), rs.getString("image"), rs.getString("time"));
+                    rs.getString("msg"), rs.getString("image"), rs.getString("time"), isAnonymity);
         });
 
         return msgs;

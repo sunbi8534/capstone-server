@@ -134,7 +134,7 @@ public class StudyRepository {
                 return "codeError";
         }
 
-        String insSql = "update set cur_num = cur_num + 1 where room_key = ?;";
+        String insSql = "update study_info set cur_num = cur_num + 1 where room_key = ?;";
         String insertChatInSql = "insert into study_chat_in (nickname, msg_num, is_on, room_key) values" +
                 " (?, ?, ?, ?);";
         jdbcTemplate.update(insSql, joinInfo.getRoomKey());
