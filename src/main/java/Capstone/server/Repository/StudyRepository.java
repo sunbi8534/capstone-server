@@ -23,14 +23,18 @@ public class StudyRepository {
 
     public List<StudyInfoDto> getStudyRoomList(String nickname, RoomStatusDto roomStatus) {
         String findCourseSql = "select course_name from take where nickname = ?;";
+        List<StudyInfoDto> studyInfoDtos = new ArrayList<>();
         List<String> course = jdbcTemplate.query(findCourseSql, (rs, rowNum) -> {
             return new String(rs.getString("course_name"));
         }, nickname);
 
+        if(course.isEmpty())
+            return studyInfoDtos;
+
         String findStudySql = "select room_key, room_name, course_name, max_num," +
                 " cur_num, leader, start_date, is_open, study_introduction from study_info where course_name = ?;";
 
-        List<StudyInfoDto> studyInfoDtos = new ArrayList<>();
+
         for(String c : course) {
             List<StudyInfoDto> infos = jdbcTemplate.query(findStudySql, (rs, rowNum) -> {
                 String leader = rs.getString("leader");
