@@ -24,6 +24,8 @@ public class QuizRepository {
         List<QuizInfo> quiz = jdbcTemplate.query(sql, (rs, rowNum) -> {
             return new QuizInfo(rs.getInt("quiz_key"), rs.getString("quiz_name"), rs.getInt("quiz_num"));
         }, course, nickname);
+        if(quiz.isEmpty())
+            return quizInfoDtos;
 
         for(QuizInfo q : quiz) {
             String tableName = "quiz_" + String.valueOf(q.getQuizKey());
@@ -70,11 +72,11 @@ public class QuizRepository {
         String insertSql = "insert into quiz_info (my_key, course_name, nickname, quiz_name, quiz_num) values" +
                 " (?, ?, ?, ?, 0);";
         jdbcTemplate.update(insertSql, key, quiz.getCourse(), quiz.getNickname(), quiz.getQuizName());
-        String getKeySql = "select quiz_key from quiz_info where my_key = ? and nickname = ?;";
+        String getKeySql = "select quiz_key from quiz_info where my_key = ? and nickname = ? and course_name = ?;";
 
         List<Integer> quizKey = jdbcTemplate.query(getKeySql, (rs, rowNum) -> {
             return Integer.valueOf(rs.getInt("quiz_key"));
-        }, key, quiz.getNickname());
+        }, key, quiz.getNickname(), quiz.getCourse());
         int qKey = quizKey.get(0);
 
         String tableName = "quiz_" + String.valueOf(qKey);
@@ -92,6 +94,15 @@ public class QuizRepository {
         });
 
         return quiz;
+    }
+
+    public void deleteQuizKey(int quizKey) {
+        String tableName = "quiz_" + String.valueOf(quizKey);
+        String dropSql = "drop table " + tableName + ";";
+        String deleteSql = "delete from quiz_info where quiz_key = ?;";
+
+        jdbcTemplate.update(dropSql);
+        jdbcTemplate.update(deleteSql, quizKey);
     }
 
     public void makeQuiz(int quizKey, List<QuizDto> quiz) {

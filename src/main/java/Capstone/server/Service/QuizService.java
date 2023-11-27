@@ -20,7 +20,7 @@ public class QuizService {
     }
 
     public List<String> getMyQuizFolderName(String nickname) {
-        return getMyQuizFolderName(nickname);
+        return quizRepository.getMyQuizFolderName(nickname);
     }
 
     public void makeQuizFolder(QuizMakeDto quiz) {
@@ -33,6 +33,10 @@ public class QuizService {
 
     public void makeQuiz(int quizKey, List<QuizDto> quiz) {
         quizRepository.makeQuiz(quizKey, quiz);
+    }
+
+    public void deleteQuizFolder(int quizKey) {
+        quizRepository.deleteQuizKey(quizKey);
     }
 
 }

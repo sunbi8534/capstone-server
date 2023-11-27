@@ -2,6 +2,7 @@ package Capstone.server.Repository;
 
 import Capstone.server.DTO.Chat.Msg;
 import Capstone.server.DTO.Profile.UserInfoMinimumDto;
+import Capstone.server.DTO.Quiz.QuizDto;
 import Capstone.server.DTO.Study.*;
 import Capstone.server.Service.ProfileService;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -406,6 +407,23 @@ public class StudyRepository {
         }, info.getFolderKey());
 
         return contents;
+    }
+
+    public void plusQuiz(int quizKey, List<QuizDto> quiz) {
+        String tableName = "quiz_" + String.valueOf(quizKey);
+        String getSql = "select num from " + tableName + " order by num asc;";
+        List<Integer> nums = jdbcTemplate.query(getSql, (rs, rowNum) -> {
+            return Integer.valueOf(rs.getInt("num"));
+        });
+        int lastNum = nums.get(nums.size() - 1);
+        String sql = "insert into " + tableName + " (num, question, answer, is_solved)" +
+                " values (?, ?, ?, ?);";
+
+        int num = lastNum + 1;
+        for(QuizDto q : quiz) {
+            jdbcTemplate.update(sql, num, q.getQuestion(), q.getAnswer(), q.getIsSolved());
+            num++;
+        }
     }
 }
 

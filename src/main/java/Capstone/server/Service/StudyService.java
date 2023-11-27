@@ -65,10 +65,10 @@ public class StudyService {
         List<MsgDto> msgDtos = new ArrayList<>();
 
         List<Msg> msgs = studyRepository.getAllMsgs(roomKey, nickname);
-        if(msgs == null)
+        if (msgs == null)
             return msgDtos;
 
-        for(Msg msg : msgs) {
+        for (Msg msg : msgs) {
             MsgDto msgDto = new MsgDto(msg.getNickname(), msg.getType(), msg.getMsg(), msg.getImage(), msg.getTime());
             msgDtos.add(msgDto);
         }
@@ -89,10 +89,10 @@ public class StudyService {
     public List<MsgDto> getUnreadMsg(int roomKey, String nickname) {
         List<MsgDto> unreadMsg = new ArrayList<>();
         List<Msg> msgs = studyRepository.getUnreadMsg(roomKey, nickname);
-        if(msgs.isEmpty())
+        if (msgs.isEmpty())
             return unreadMsg;
 
-        for(Msg msg : msgs) {
+        for (Msg msg : msgs) {
             MsgDto msgDto = new MsgDto(msg.getNickname(), msg.getType(), msg.getMsg(), msg.getImage(), msg.getTime());
             unreadMsg.add(msgDto);
         }
@@ -121,10 +121,10 @@ public class StudyService {
 
     public String enrollFile(int roomKey, int folderKey, String nickname, MultipartFile file) {
         try {
-            if(!studyRepository.checkFileEnrollCan(roomKey, folderKey, nickname))
+            if (!studyRepository.checkFileEnrollCan(roomKey, folderKey, nickname))
                 return "already enroll";
 
-            if(!file.getContentType().equalsIgnoreCase("application/pdf")) {
+            if (!file.getContentType().equalsIgnoreCase("application/pdf")) {
                 return "no pdf File";
             }
             InputStream inputStream = file.getInputStream();
@@ -135,7 +135,7 @@ public class StudyService {
 
             studyRepository.enrollFileContent(roomKey, folderKey, nickname, content);
             document.close();
-        }catch (IOException e) {
+        } catch (IOException e) {
             e.printStackTrace();
         }
 
@@ -154,11 +154,11 @@ public class StudyService {
         List<QuizDto> quiz = new ArrayList<>();
         List<String> contents = studyRepository.getQuizContents(info);
         StringBuilder allContents = new StringBuilder();
-        if(contents.isEmpty()) {
+        if (contents.isEmpty()) {
             System.out.println("empty");
         }
 
-        for(String c : contents) {
+        for (String c : contents) {
             allContents.append(c);
         }
 
@@ -166,8 +166,8 @@ public class StudyService {
         System.out.println(result);
         String limiter = "```json";
         int index = result.indexOf(limiter);
-        if(index != -1) {
-            result = result.substring(index+8, result.length());
+        if (index != -1) {
+            result = result.substring(index + 8, result.length());
             System.out.println("hell");
             System.out.println(result);
             limiter = "```";
@@ -195,5 +195,9 @@ public class StudyService {
 
     public List<StudyQuizListDto> getQuizList(int roomKey) {
         return studyRepository.getQuizList(roomKey);
+    }
+
+    public void plusQuiz(int quizKey, List<QuizDto> quiz) {
+        studyRepository.plusQuiz(quizKey, quiz);
     }
 }

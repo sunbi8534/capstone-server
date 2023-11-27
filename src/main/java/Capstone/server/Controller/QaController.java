@@ -100,4 +100,10 @@ public class QaController {
     public String getQaStatus(@RequestParam int qaKey) {
         return qaService.getQaStatus(qaKey);
     }
+
+    @ResponseBody
+    @GetMapping("/qa/isWatching")
+    public boolean getQaIsWatching(@RequestParam int qaKey) {
+        return qaService.getIsWatching(qaKey);
+    }
 }

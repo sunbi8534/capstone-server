@@ -75,4 +75,8 @@ public class QaService {
     public String getQaStatus(int qaKey) {
         return qaRepository.getQaStatus(qaKey);
     }
+
+    public boolean getIsWatching(int qaKey) {
+        return qaRepository.isWatching(qaKey);
+    }
 }

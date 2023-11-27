@@ -137,4 +137,10 @@ public class StudyController {
     public List<StudyQuizListDto> getFolderList(@RequestParam int roomKey) {
         return studyService.getQuizList(roomKey);
     }
+
+    @ResponseBody
+    @PostMapping("/study/quiz/add/{quizKey}")
+    public void addQuiz(@PathVariable int quizKey, @RequestBody List<QuizDto> quiz) {
+        studyService.plusQuiz(quizKey, quiz);
+    }
 }

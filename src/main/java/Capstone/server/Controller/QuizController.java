@@ -47,4 +47,10 @@ public class QuizController {
     public void makeQuiz(@PathVariable int quizKey, @RequestBody List<QuizDto> quiz) {
         quizService.makeQuiz(quizKey, quiz);
     }
+
+    @ResponseBody
+    @PostMapping("/user/quiz/delete/{quizKey}")
+    public void deleteQuizFolder(@PathVariable int quizKey) {
+        quizService.deleteQuizFolder(quizKey);
+    }
 }
