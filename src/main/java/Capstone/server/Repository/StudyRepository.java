@@ -165,10 +165,10 @@ public class StudyRepository {
     }
 
     public String joinStudy(String nickname, StudyJoinDto joinInfo) {
-        String checkCodeSql = "select max_num, cur_num, is_open, code, course from study_info where room_key = ?;";
+        String checkCodeSql = "select max_num, cur_num, is_open, code, course_name from study_info where room_key = ?;";
         List<RoomJoinInfo> v = jdbcTemplate.query(checkCodeSql, (rs, rowNum) -> {
             return new RoomJoinInfo(rs.getInt("max_num"), rs.getInt("cur_num"),
-                    rs.getBoolean("is_open"), rs.getString("code"), rs.getString("course"));
+                    rs.getBoolean("is_open"), rs.getString("code"), rs.getString("course_name"));
         }, joinInfo.getRoomKey());
 
         RoomJoinInfo info = v.get(0);
