@@ -329,19 +329,32 @@ public class QaRepository {
         jdbcTemplate.update(updateHandleGiveupSql, nickname, qaKey);
     }
 
+    public List<QaAlarmDto> getQaAlarm(String nickname) {
+        String getAlarmSql = "select qa_key, course_name from alarm where nickname = ?;";
+        String deleteAlarmSql = "delete from alarm where nickname = ?;";
+        List<QaAlarmDto> alarmDtos = jdbcTemplate.query(getAlarmSql, (rs, rowNum) -> {
+            return new QaAlarmDto(nickname, rs.getInt("qa_key"), rs.getString("course_name"));
+        }, nickname);
+
+        jdbcTemplate.update(deleteAlarmSql, nickname);
+        return alarmDtos;
+    }
+
     public void qaSolve(int qaKey) {
         long epochTime = Instant.now().getEpochSecond();
         String solveQaSql = "update qa set is_solving = true, time = ? where qa_key = ?;";
-        String getSql = "select solver from qa where qa_key = ?;";
-        List<String> solver = jdbcTemplate.query(getSql, (rs, rowNum) -> {
-            return String.valueOf(rs.getString("solver"));
+        String getSql = "select questioner, solver, course_name from qa where qa_key = ?;";
+        List<QaQS> qaQSList = jdbcTemplate.query(getSql, (rs, rowNum) -> {
+            return new QaQS(rs.getString("questioner"), rs.getString("solver"), rs.getString("course_name"));
         }, qaKey);
-        String nickname = solver.get(0);
+        QaQS qs = qaQSList.get(0);
+
         String updateSql = "insert into handle_answer (nickname, qa_key) values (?, ?);";
+        String updateAlarmSql = "insert into alarm (nickname, qa_key, course_name) values (?, ?, ?);";
 
-
+        jdbcTemplate.update(updateAlarmSql, qs.getQuestioner(), qaKey, qs.getCourse());
         jdbcTemplate.update(solveQaSql, epochTime, qaKey);
-        jdbcTemplate.update(updateSql, nickname, qaKey);
+        jdbcTemplate.update(updateSql, qs.getSolver(), qaKey);
     }
 
     public void sendQaMsg(int qaKey, QaSendMsgDto msg) {

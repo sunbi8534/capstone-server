@@ -42,6 +42,10 @@ public class QaService {
         qaRepository.qaGiveUp(qaKey, nickname);
     }
 
+    public List<QaAlarmDto> getQaAlarm(String nickname) {
+        return qaRepository.getQaAlarm(nickname);
+    }
+
     public void qaSolve(int qaKey) {
         qaRepository.qaSolve(qaKey);
     }

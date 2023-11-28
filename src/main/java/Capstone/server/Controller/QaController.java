@@ -56,6 +56,12 @@ public class QaController {
     }
 
     @ResponseBody
+    @GetMapping("/qa/alarm")
+    public List<QaAlarmDto> getQaAlarm(@RequestParam String nickname) {
+        return qaService.getQaAlarm(nickname);
+    }
+
+    @ResponseBody
     @PostMapping("/qa/chat/{qaKey}") //D
     public void sendQaMsg(@PathVariable int qaKey, @RequestBody QaSendMsgDto msg) {
         qaService.sendQaMsg(qaKey, msg);
