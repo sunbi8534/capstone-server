@@ -415,7 +415,11 @@ public class StudyRepository {
         List<Integer> nums = jdbcTemplate.query(getSql, (rs, rowNum) -> {
             return Integer.valueOf(rs.getInt("num"));
         });
-        int lastNum = nums.get(nums.size() - 1);
+        int lastNum;
+        if(nums.isEmpty())
+            lastNum = 0;
+        else
+            lastNum = nums.get(nums.size() - 1);
         String sql = "insert into " + tableName + " (num, question, answer, is_solved)" +
                 " values (?, ?, ?, ?);";
 
