@@ -164,13 +164,10 @@ public class StudyService {
         }
 
         String result = chatGptService.getQuiz(allContents, info.getQuizNum());
-        System.out.println(result);
         String limiter = "```json";
         int index = result.indexOf(limiter);
         if (index != -1) {
             result = result.substring(index + 8, result.length());
-            System.out.println("hell");
-            System.out.println(result);
             limiter = "```";
             index = result.indexOf(limiter);
             result = result.substring(0, index);
@@ -183,6 +180,9 @@ public class StudyService {
             e.printStackTrace();
         }
 
+        for(Quiz q : quiz) {
+            System.out.println(q.getQuizNum()+ q.getQuestion()+ q.getAnswer());
+        }
         return quiz;
     }
 
