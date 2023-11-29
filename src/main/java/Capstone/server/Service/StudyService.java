@@ -5,6 +5,7 @@ import Capstone.server.DTO.Chat.Msg;
 import Capstone.server.DTO.Chat.MsgDto;
 import Capstone.server.DTO.Chat.SendMsgDto;
 import Capstone.server.DTO.Profile.UserInfoMinimumDto;
+import Capstone.server.DTO.Quiz.Quiz;
 import Capstone.server.DTO.Quiz.QuizDto;
 import Capstone.server.DTO.Study.*;
 import Capstone.server.Repository.StudyRepository;
@@ -150,8 +151,8 @@ public class StudyService {
         studyRepository.makeFolder(roomKey, folderName);
     }
 
-    public List<QuizDto> getQuiz(StudyQuizInfoDto info) {
-        List<QuizDto> quiz = new ArrayList<>();
+    public List<Quiz> getQuiz(StudyQuizInfoDto info) {
+        List<Quiz> quiz = new ArrayList<>();
         List<String> contents = studyRepository.getQuizContents(info);
         StringBuilder allContents = new StringBuilder();
         if (contents.isEmpty()) {

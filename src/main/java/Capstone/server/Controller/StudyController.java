@@ -2,6 +2,7 @@ package Capstone.server.Controller;
 
 import Capstone.server.DTO.Chat.MsgDto;
 import Capstone.server.DTO.Profile.UserInfoMinimumDto;
+import Capstone.server.DTO.Quiz.Quiz;
 import Capstone.server.DTO.Quiz.QuizDto;
 import Capstone.server.DTO.Study.*;
 import Capstone.server.Service.StudyService;
@@ -116,7 +117,7 @@ public class StudyController {
 
     @ResponseBody
     @GetMapping("/study/quiz")
-    public List<QuizDto> getQuiz(@RequestBody StudyQuizInfoDto info) {
+    public List<Quiz> getQuiz(@RequestBody StudyQuizInfoDto info) {
         return studyService.getQuiz(info);
     }
 

@@ -19,6 +19,7 @@ public class OpenAIRestTemplateConfig {
     public RestTemplate openaiRestTemplate() {
         RestTemplate restTemplate = new RestTemplate();
         String s = "";
+
         try{
             BufferedReader br = new BufferedReader(new FileReader("/home/ec2-user/server/capstone-server/k.txt"));
             s = br.readLine();
