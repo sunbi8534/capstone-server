@@ -175,7 +175,7 @@ public class StudyService {
         System.out.println(result);
         try {
             ObjectMapper objectMapper = new ObjectMapper();
-            quiz = objectMapper.readValue(result, objectMapper.getTypeFactory().constructCollectionType(List.class, QuizDto.class));
+            quiz = objectMapper.readValue(result, objectMapper.getTypeFactory().constructCollectionType(List.class, Quiz.class));
         } catch (JsonProcessingException e) {
             e.printStackTrace();
         }
