@@ -422,6 +422,8 @@ public class StudyRepository {
             lastNum = nums.get(nums.size() - 1);
         String sql = "insert into " + tableName + " (num, question, answer, is_solved)" +
                 " values (?, ?, ?, ?);";
+        String updateSql = "update quiz_info set quiz_num = quiz_num + ? where quiz_key = ?;";
+        jdbcTemplate.update(updateSql, quiz.size(), quizKey);
 
         int num = lastNum + 1;
         for(QuizDto q : quiz) {
