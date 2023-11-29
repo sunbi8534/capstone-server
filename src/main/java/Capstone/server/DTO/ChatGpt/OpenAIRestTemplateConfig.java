@@ -8,6 +8,7 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.web.client.RestTemplate;
 
 import java.io.BufferedReader;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
@@ -19,8 +20,7 @@ public class OpenAIRestTemplateConfig {
         RestTemplate restTemplate = new RestTemplate();
         String s = "";
         try{
-            ClassPathResource resource = new ClassPathResource("k.txt");
-            BufferedReader br = new BufferedReader(new InputStreamReader(resource.getInputStream()));
+            BufferedReader br = new BufferedReader(new FileReader("/home/ec2-user/server/capstone-server/k.txt"));
             s = br.readLine();
         } catch (IOException e) {
             throw new RuntimeException(e);
