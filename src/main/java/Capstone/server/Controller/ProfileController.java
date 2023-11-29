@@ -183,4 +183,10 @@ public class ProfileController {
     public int getPoint(@RequestParam String nickname) {
         return profileService.getPoint(nickname);
     }
+
+    @ResponseBody
+    @GetMapping("/user/qa/review")
+    public double getUserReview(@RequestParam String nickname) {
+        return profileService.getUserReview(nickname);
+    }
 }

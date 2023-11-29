@@ -112,4 +112,5 @@ public class QaController {
     public boolean getQaIsWatching(@RequestParam int qaKey) {
         return qaService.getIsWatching(qaKey);
     }
+
 }
