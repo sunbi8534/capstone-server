@@ -21,7 +21,7 @@ public class OpenAIRestTemplateConfig {
         String s = "";
 
         try{
-            BufferedReader br = new BufferedReader(new FileReader("/home/ec2-user/server/capstone-server/k.txt"));
+            BufferedReader br = new BufferedReader(new FileReader("/home/ec2-user/capstone-server/key.txt"));
             s = br.readLine();
         } catch (IOException e) {
             throw new RuntimeException(e);
