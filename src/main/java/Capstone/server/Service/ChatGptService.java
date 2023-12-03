@@ -18,7 +18,7 @@ public class ChatGptService {
         String model = "gpt-4-1106-preview";
         String apiUrl = "https://api.openai.com/v1/chat/completions";
 
-
+        //
         contents.append(" 를 읽고 " +
                 " 이 문장들에서 얻을 수 있는 개념에 대한 문제와 답을 json형식으로 quizNum변수에 int형으로 1부터 차례대로 문제번호를 저장하고," +
                 "question변수에 1개의 문제를, answer변수에 1개의 정답을 저장해서 총 ");
