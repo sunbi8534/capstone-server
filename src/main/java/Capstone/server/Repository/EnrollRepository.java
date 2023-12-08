@@ -72,7 +72,7 @@ public class EnrollRepository {
     public void enrollUser(UserDto userDto) {
         String base;
         try {
-            File file = new File("123.png");
+            File file = new File("Capstone/server/Repository/123.png");
             byte[] bt = new byte[(int) file.length()];
             FileInputStream f = new FileInputStream(file);
             f.read(bt);
