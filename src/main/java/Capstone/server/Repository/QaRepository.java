@@ -251,8 +251,28 @@ public class QaRepository {
         }, qaKey);
         FinishInfo info = finishInfos.get(0);
 
+        String getReviewSql = "select review from qa where solver = ? and status = true;";
+        List<Integer> reviewValues = jdbcTemplate.query(getReviewSql, (rs, rowNum) -> {
+            return Integer.valueOf(rs.getInt("review"));
+        }, info.getSolver());
+
+        int point;
+        if (reviewValues.isEmpty())
+            point = (int)(info.getPoint() * 0.9);
+        else {
+            float sum = 0;
+            for(int v : reviewValues) {
+                sum += v;
+            }
+            sum = sum / reviewValues.size();
+            if(sum < 4.5)
+                point = (int)(info.getPoint() * 0.9);
+            else
+                point = info.getPoint();
+        }
+
         jdbcTemplate.update(updateSql1, qaKey);
-        jdbcTemplate.update(addUserPointSql, info.getPoint(), info.getSolver());
+        jdbcTemplate.update(addUserPointSql, point, info.getSolver());
         jdbcTemplate.update(updateReviewSql, review, qaKey);
     }
 
@@ -351,6 +371,8 @@ public class QaRepository {
 
         String updateSql = "insert into handle_answer (nickname, qa_key) values (?, ?);";
         String updateAlarmSql = "insert into alarm (nickname, qa_key, course_name) values (?, ?, ?);";
+
+
 
         jdbcTemplate.update(updateAlarmSql, qs.getQuestioner(), qaKey, qs.getCourse());
         jdbcTemplate.update(solveQaSql, epochTime, qaKey);
