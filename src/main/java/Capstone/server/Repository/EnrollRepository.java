@@ -6,6 +6,11 @@ import Capstone.server.Service.UtilService;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.Base64;
 import java.util.List;
 
 @Repository
@@ -65,6 +70,19 @@ public class EnrollRepository {
     }
 
     public void enrollUser(UserDto userDto) {
+        String base;
+        try {
+            File file = new File("123.png");
+            byte[] bt = new byte[(int) file.length()];
+            FileInputStream f = new FileInputStream(file);
+            f.read(bt);
+            base = Base64.getEncoder().encodeToString(bt);
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
         System.out.println(userDto.toString());
         String enrollUserSql = "insert into user (nickname, email, password, introduction," +
                 " profile_image, point, study_cnt) values (?, ?, ?, ?, ?, ?, ?);";
@@ -73,9 +91,10 @@ public class EnrollRepository {
         String insertTakeSql = "insert into take (nickname, course_name, is_now, is_past, is_pick) " +
                 "values (?, ?, ?, ?, ?);";
 
+
         String passwordHash = utilService.makeHashcode(userDto.getPassword());
         jdbcTemplate.update(enrollUserSql, userDto.getNickname(), userDto.getEmail(), passwordHash,
-                null, null, 0, 0);
+                null, base, 0, 0);
         jdbcTemplate.update(insertMajorSql, userDto.getNickname(), userDto.getDept_name1(), userDto.getDept_name2());
         for (String course_name : userDto.getCourse_name())
             jdbcTemplate.update(insertTakeSql, userDto.getNickname(), course_name, true, false, false);
